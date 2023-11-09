@@ -8,50 +8,41 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class Usuario implements NullBankModel
+class Cliente implements NullBankModel
 {
 
     public function __construct(
-        public int $id,
-        public string $nome,
-        public string $sobrenome,
-        public UserPronoumEnum|string $pronomes,
-        public string $email,
-        public Carbon|string|null $email_verified_at,
-        public string $password,
-        public int $endereco_id,
-        public UserGenderEnum|string $sexo,
-        public Carbon|string $nascido_em,
-        public string|null $remember_token,
-        public Carbon|string|null $created_at,
-        public Carbon|string|null $updated_at,
+        public string $cpf,
+        public int $usuario_id,
+        public string $rg,
+        public string $rg_emitido_por,
+        public string $uf,
+        public array $telefones,
+        public array $emails
     ){}
 
-    public static function create(array $data): Usuario
+    public static function create(array $data): Cliente
     {
-        $password = Hash::make($data['password']);
+        $phones = isset($data['telefones']) ? json_encode($data['telefones']) : null;
+        $emails = isset($data['emails']) ? json_encode($data['emails']) : null;
 
         $query = "
-            INSERT INTO `nullbank`.`usuarios` (
-                `nome`,
-                `sobrenome`,
-                `pronomes`,
-                `email`,
-                `password`,
-                `endereco_id`,
-                `sexo`,
-                `nascido_em`,
-                `created_at`
+            INSERT INTO `nullbank`.`clientes` (
+                `cpf`,
+                `usuario_id`,
+                `rg`,
+                `rg_emitido_por`,
+                `uf`,
+                `telefones`,
+                `emails`,
             ) VALUES (
-                '{$data['nome']}',
-                '{$data['sobrenome']}',
-                '{$data['pronomes']}',
-                '{$data['email']}',
-                '$password',
-                {$data['endereco_id']},
-                '{$data['sexo']}',
-                '{$data['nascido_em']}',
-                NOW()
+                '{$data['cpf']}',
+                 {$data['usuario_id']},
+                '{$data['rg']}',
+                '{$data['rg_emitido_por']}',
+                '{$data['uf']}',
+                $phones,
+                $emails,
             );
         ";
 
@@ -59,31 +50,25 @@ class Usuario implements NullBankModel
 
         $lastId = DB::getPdo()->lastInsertId();
 
-        return Usuario::first($lastId);
+        return Cliente::first($lastId);
     }
 
-    public static function first(int $id): Usuario
+    public static function first(int $id): Cliente
     {
         $query = "
-            SELECT * FROM `nullbank`.`usuarios` WHERE `usuarios`.`id` = $id;
+            SELECT * FROM `nullbank`.`clientes` WHERE `clientes`.`cpf` = $id;
         ";
 
         $data = DB::selectOne($query);
 
-        return new Usuario(
-            $data->id,
-            $data->nome,
-            $data->sobrenome,
-            $data->pronomes,
-            $data->email,
-            $data->email_verified_at,
-            $data->password,
-            $data->endereco_id,
-            $data->sexo,
-            $data->nascido_em,
-            $data->remember_token,
-            $data->created_at,
-            $data->updated_at,
+        return new Cliente(
+            $data->cpf,
+            $data->usuario_id,
+            $data->rg,
+            $data->rg_emitido_por,
+            $data->uf,
+            $data->telefones,
+            $data->emails
         );
     }
 
@@ -104,7 +89,7 @@ class Usuario implements NullBankModel
         ];
 
         $query = "
-            UPDATE `nullbank`.`usuarios`
+            UPDATE `nullbank`.`clientes`
             SET
               `nome` = '{$updateData['nome']}',
               `sobrenome` = '{$updateData['sobrenome']}',
@@ -121,13 +106,13 @@ class Usuario implements NullBankModel
 
         DB::update($query);
 
-        return Usuario::first($this->id);
+        return Cliente::first($this->id);
     }
 
     public function delete(): int
     {
         $query = "
-            DELETE FROM `nullbank`.`usuarios`
+            DELETE FROM `nullbank`.`clientes`
             WHERE `id` = $this->id;
         ";
 

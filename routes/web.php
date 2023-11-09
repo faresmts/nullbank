@@ -8,6 +8,8 @@ use App\Livewire\Auth\Passwords\Email;
 use App\Livewire\Auth\Passwords\Reset;
 use App\Livewire\Auth\Register;
 use App\Livewire\Auth\Verify;
+use App\NullBankModels\Usuario;
+use http\Client\Curl\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,7 +23,29 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', function () {
+    $user = Usuario::first(2);
+    $new = $user->delete();
+    dd($new);
+
+//    $data = [
+//        'nome' => 'Maria',
+//        'sobrenome' => 'Naiane Moita',
+//        'pronomes' => 'ela/dela',
+//        'email' => 'nai@stargrid.pro',
+//        'password' => 'nai@123',
+//        'endereco_id' => '1',
+//        'sexo' => 'F',
+//        'nascido_em' => now()->toDateTimeString(),
+//        'created_at' => now()->toDateTimeString(),
+//    ];
+//
+//    $user2 = Usuario::create($data);
+
+    dd($user2);
+
+    return 'teste';
+})->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
