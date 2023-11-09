@@ -32,7 +32,9 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "Database\\NullBankMigrations\\": "database/nullbank_migrations/",
+            "App\\NullBankModels\\" : "app/NullBankModels"
         }
     },
     "scripts": {
