@@ -100,7 +100,6 @@ class Usuario implements NullBankModel
             'endereco_id' => $data['$this->endereco_id'] ?? $this->endereco_id,
             'sexo' => $data['sexo'] ?? $this->sexo,
             'nascido_em' => $data['nascido_em'] ?? $this->nascido_em,
-            'updated_at' => NOW()
         ];
 
         $query = "
@@ -114,7 +113,7 @@ class Usuario implements NullBankModel
               `endereco_id` = '{$updateData['endereco_id']}',
               `sexo` = '{$updateData['sexo']}',
               `nascido_em` = '{$updateData['nascido_em']}',
-              `updated_at` = '{$updateData['updated_at']}'
+              `updated_at` = NOW()
             WHERE
               `id` = $this->id;
         ";

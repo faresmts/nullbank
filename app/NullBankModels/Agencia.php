@@ -63,7 +63,6 @@ class Agencia implements NullBankModel
             'nome' => $data['nome'] ?? $this->nome,
             'endereco_id' => $data['$this->endereco_id'] ?? $this->endereco_id,
             'montante_salarios' => $data['montante_salarios'] ?? $this->montante_salarios,
-            'updated_at' => NOW()
         ];
 
         $query = "
@@ -72,7 +71,7 @@ class Agencia implements NullBankModel
               `nome` = '{$updateData['nome']}',
               `endereco_id` = '{$updateData['endereco_id']}',
               `montante_salarios` = '{$updateData['montante_salarios']}',
-              `updated_at` = '{$updateData['updated_at']}'
+              `updated_at` = NOW()
             WHERE
               `id` = $this->id;
         ";
