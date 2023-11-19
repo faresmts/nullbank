@@ -15,8 +15,7 @@ class Migrator
             CreateDependentesTable::class,
             CreateClientesTable::class,
             CreateContasTable::class,
-            CreateAgenciaContaTable::class,
-            CreateAgenciaContaClienteTable::class,
+            CreateClienteContaTable::class,
             CreateTransacoesTable::class,
             CreatePermissoesTable::class,
             CreateUsuarioPermissaoTable::class

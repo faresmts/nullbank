@@ -13,6 +13,7 @@ class CreateFuncionariosTable implements NullBankMigration
               `usuario_id` INT NOT NULL,
               `agencia_id` INT NOT NULL,
               `matricula` VARCHAR(45) NOT NULL,
+              `senha` VARCHAR(100) NULL,
               `cargo` ENUM('G', 'A', 'C') NULL,
               `salario` DECIMAL(8,2) NULL,
               `created_at` DATETIME NULL,

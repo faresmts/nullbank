@@ -26,8 +26,8 @@ class Transacao implements NullBankModel
                 `created_at`
             ) VALUES (
                 {$data['conta_id']},
-                " . ($data['tipo'] ? "'{$data['tipo']}'" : 'NULL') . ",
-                " . ($data['valor'] ? "'{$data['valor']}'" : 'NULL') . ",
+                {$data['tipo']},
+                {$data['valor']},
                 NOW()
             );
         ";
@@ -69,8 +69,8 @@ class Transacao implements NullBankModel
             UPDATE `nullbank`.`transacoes`
             SET
               `conta_id` = '{$updateData['conta_id']}',
-              `tipo` = " . ($updateData['tipo'] ? "'{$updateData['tipo']}'" : 'NULL') . ",
-              `valor` = " . ($updateData['valor'] ? "'{$updateData['valor']}'" : 'NULL') . ",
+              `tipo` = '{$updateData['tipo']}',
+              `valor` = '{$updateData['valor']}',
               `updated_at` = NOW()
             WHERE
               `id` = $this->id;

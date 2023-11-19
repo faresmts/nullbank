@@ -1,0 +1,613 @@
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`logradouro_tipos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`logradouro_tipos` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`enderecos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`enderecos` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `logradouro_tipo_id` INT NOT NULL,
+  `logradouro` VARCHAR(45) NOT NULL,
+  `numero` VARCHAR(5) NOT NULL,
+  `bairro` VARCHAR(45) NOT NULL,
+  `cep` CHAR(8) NOT NULL,
+  `cidade` VARCHAR(45) NOT NULL,
+  `estado` CHAR(2) NOT NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_enderecos_logradouro_tipos1_idx` (`logradouro_tipo_id` ASC) VISIBLE,
+  CONSTRAINT `fk_enderecos_logradouro_tipos1`
+    FOREIGN KEY (`logradouro_tipo_id`)
+    REFERENCES `nullbank`.`logradouro_tipos` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`agencias`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`agencias` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(45) NOT NULL,
+  `endereco_id` INT NOT NULL,
+  `montante_salarios` DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_agencias_enderecos1_idx` (`endereco_id` ASC) VISIBLE,
+  CONSTRAINT `fk_agencias_enderecos1`
+    FOREIGN KEY (`endereco_id`)
+    REFERENCES `nullbank`.`enderecos` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`usuarios`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`usuarios` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(45) NULL,
+  `sobrenome` VARCHAR(45) NULL,
+  `pronomes` ENUM('ele/dele', 'ela/dela', 'neutros') NULL,
+  `email` VARCHAR(100) NULL,
+  `email_verified_at` TIMESTAMP NULL,
+  `password` VARCHAR(100) NULL,
+  `endereco_id` INT NOT NULL,
+  `sexo` ENUM('M', 'F', 'O') NULL,
+  `nascido_em` DATE NULL,
+  `remember_token` VARCHAR(100) NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_usuarios_enderecos1_idx` (`endereco_id` ASC) VISIBLE,
+  CONSTRAINT `fk_usuarios_enderecos1`
+    FOREIGN KEY (`endereco_id`)
+    REFERENCES `nullbank`.`enderecos` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`funcionarios`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`funcionarios` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `usuario_id` INT NOT NULL,
+  `agencia_id` INT NOT NULL,
+  `matricula` VARCHAR(45) NOT NULL,
+  `senha` VARCHAR(100) NULL,
+  `cargo` ENUM('G', 'A', 'C') NULL,
+  `salario` DECIMAL(8,2) NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_funcionarios_usuarios_idx` (`usuario_id` ASC) VISIBLE,
+  INDEX `fk_funcionarios_agencias1_idx` (`agencia_id` ASC) VISIBLE,
+  UNIQUE INDEX `matricula_UNIQUE` (`matricula` ASC) VISIBLE,
+  CONSTRAINT `fk_funcionarios_usuarios`
+    FOREIGN KEY (`usuario_id`)
+    REFERENCES `nullbank`.`usuarios` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_funcionarios_agencias1`
+    FOREIGN KEY (`agencia_id`)
+    REFERENCES `nullbank`.`agencias` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`dependentes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`dependentes` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `funcionario_id` INT NOT NULL,
+  `nome` VARCHAR(100) NULL,
+  `nascido_em` DATE NULL,
+  `parentesco` ENUM('F', 'C', 'G') NULL,
+  `idade` INT NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`id`, `funcionario_id`),
+  INDEX `fk_dependentes_funcionarios1_idx` (`funcionario_id` ASC) VISIBLE,
+  UNIQUE INDEX `nome_UNIQUE` (`nome` ASC) VISIBLE,
+  CONSTRAINT `fk_dependentes_funcionarios1`
+    FOREIGN KEY (`funcionario_id`)
+    REFERENCES `nullbank`.`funcionarios` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`clientes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`clientes` (
+  `cpf` CHAR(11) NOT NULL,
+  `usuario_id` INT NOT NULL,
+  `rg` VARCHAR(15) NULL,
+  `rg_emitido_por` VARCHAR(45) NULL,
+  `uf` CHAR(2) NULL,
+  `telefones` JSON NULL,
+  `emails` JSON NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`cpf`),
+  INDEX `fk_clientes_usuarios1_idx` (`usuario_id` ASC) VISIBLE,
+  UNIQUE INDEX `rg_UNIQUE` (`rg` ASC) VISIBLE,
+  CONSTRAINT `fk_clientes_usuarios1`
+    FOREIGN KEY (`usuario_id`)
+    REFERENCES `nullbank`.`usuarios` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`contas`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`contas` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `gerente_id` INT NOT NULL,
+  `agencia_id` INT NOT NULL,
+  `saldo` DECIMAL(12,2) NOT NULL DEFAULT 0,
+  `senha` VARCHAR(45) NOT NULL,
+  `tipo` ENUM('CC', 'CP', 'CE') NOT NULL,
+  `juros` DECIMAL(5,2) NULL,
+  `limite_credito` DECIMAL(10,2) NULL,
+  `aniversario` DATE NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_contas_funcionarios1_idx` (`gerente_id` ASC) VISIBLE,
+  INDEX `fk_contas_agencias1_idx` (`agencia_id` ASC) VISIBLE,
+  CONSTRAINT `fk_contas_funcionarios1`
+    FOREIGN KEY (`gerente_id`)
+    REFERENCES `nullbank`.`funcionarios` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_contas_agencias1`
+    FOREIGN KEY (`agencia_id`)
+    REFERENCES `nullbank`.`agencias` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`transacoes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`transacoes` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `conta_id` INT NOT NULL,
+  `tipo` ENUM('S', 'D', 'P', 'E', 'T') NOT NULL,
+  `valor` DECIMAL(12,2) NOT NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_transacoes_contas1_idx` (`conta_id` ASC) VISIBLE,
+  CONSTRAINT `fk_transacoes_contas1`
+    FOREIGN KEY (`conta_id`)
+    REFERENCES `nullbank`.`contas` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`permissoes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`permissoes` (
+  `id` INT NOT NULL,
+  `nome` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`usuario_permissao`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`usuario_permissao` (
+  `usuarios_id` INT NOT NULL,
+  `permissoes_id` INT NOT NULL,
+  PRIMARY KEY (`usuarios_id`, `permissoes_id`),
+  INDEX `fk_usuarios_has_permissoes_permissoes1_idx` (`permissoes_id` ASC) VISIBLE,
+  INDEX `fk_usuarios_has_permissoes_usuarios1_idx` (`usuarios_id` ASC) VISIBLE,
+  CONSTRAINT `fk_usuarios_has_permissoes_usuarios1`
+    FOREIGN KEY (`usuarios_id`)
+    REFERENCES `nullbank`.`usuarios` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_usuarios_has_permissoes_permissoes1`
+    FOREIGN KEY (`permissoes_id`)
+    REFERENCES `nullbank`.`permissoes` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `nullbank`.`cliente_conta`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `nullbank`.`cliente_conta` (
+  `conta_id` INT NOT NULL,
+  `cliente_cpf` CHAR(11) NOT NULL,
+  PRIMARY KEY (`conta_id`, `cliente_cpf`),
+  INDEX `fk_contas_has_clientes_clientes1_idx` (`cliente_cpf` ASC) VISIBLE,
+  INDEX `fk_contas_has_clientes_contas1_idx` (`conta_id` ASC) VISIBLE,
+  CONSTRAINT `fk_contas_has_clientes_contas1`
+    FOREIGN KEY (`conta_id`)
+    REFERENCES `nullbank`.`contas` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_contas_has_clientes_clientes1`
+    FOREIGN KEY (`cliente_cpf`)
+    REFERENCES `nullbank`.`clientes` (`cpf`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+-- Queries de Manipulação de Dados --
+
+-- Query para criar registros nas tabelas --
+
+-- Agencia --
+INSERT INTO `nullbank`.`agencias` (
+    `nome`,
+    `endereco_id`,
+    `montante_salarios`,
+    `created_at`
+) VALUES (
+    '{$data['nome']}',
+    {$data['endereco_id']},
+    '{$data['montante_salarios']}',
+    NOW()
+);
+
+-- Usuario --
+INSERT INTO `nullbank`.`usuarios` (
+    `nome`,
+    `sobrenome`,
+    `pronomes`,
+    `email`,
+    `email_verified_at`,
+    `password`,
+    `endereco_id`,
+    `sexo`,
+    `nascido_em`,
+    `remember_token`,
+    `created_at`
+) VALUES (
+    '{$data['nome']}',
+    '{$data['sobrenome']}',
+    '{$data['pronomes']}',
+    '{$data['email']}',
+    " . ($data['email_verified_at'] ? "'{$data['email_verified_at']}'" : 'NULL') . ",
+    '{$data['password']}',
+    {$data['endereco_id']},
+    '{$data['sexo']}',
+    " . ($data['nascido_em'] ? "'{$data['nascido_em']}'" : 'NULL') . ",
+    '{$data['remember_token']}',
+    NOW()
+);
+
+-- Funcionario --
+INSERT INTO `nullbank`.`funcionarios` (
+    `usuario_id`,
+    `agencia_id`,
+    `matricula`,
+    `senha`,
+    `cargo`,
+    `salario`,
+    `created_at`
+) VALUES (
+    {$data['usuario_id']},
+    {$data['agencia_id']},
+    '{$data['matricula']}',
+    " . ($data['senha'] ? "'{$data['senha']}'" : 'NULL') . ",
+    " . ($data['cargo'] ? "'{$data['cargo']}'" : 'NULL') . ",
+    " . ($data['salario'] ? "'{$data['salario']}'" : 'NULL') . ",
+    NOW()
+);
+
+-- Permissao --
+INSERT INTO `nullbank`.`permissoes` (
+    `nome`
+) VALUES (
+    '{$data['nome']}'
+);
+
+-- Transacao --
+INSERT INTO `nullbank`.`transacoes` (
+    `conta_id`,
+    `tipo`,
+    `valor`,
+    `created_at`
+) VALUES (
+    {$data['conta_id']},
+    " . ($data['tipo'] ? "'{$data['tipo']}'" : 'NULL') . ",
+    " . ($data['valor'] ? "'{$data['valor']}'" : 'NULL') . ",
+    NOW()
+);
+
+-- Cliente --
+INSERT INTO `nullbank`.`clientes` (
+    `cpf`,
+    `usuario_id`,
+    `rg`,
+    `rg_emitido_por`,
+    `uf`,
+    `telefones`,
+    `emails`,
+    `created_at`
+) VALUES (
+    '{$data['cpf']}',
+    {$data['usuario_id']},
+    '{$data['rg']}',
+    '{$data['rg_emitido_por']}',
+    '{$data['uf']}',
+    " . ($data['telefones'] ? "'{$data['telefones']}'" : 'NULL') . ",
+    " . ($data['emails'] ? "'{$data['emails']}'" : 'NULL') . ",
+    NOW()
+);
+
+-- Conta --
+INSERT INTO `nullbank`.`contas` (
+    `gerente_id`,
+    `agencia_id`,
+    `saldo`,
+    `senha`,
+    `tipo`,
+    `juros`,
+    `limite_credito`,
+    `aniversario`,
+    `created_at`
+) VALUES (
+    {$data['gerente_id']},
+    {$data['agencia_id']},
+    '{$data['saldo']}',
+    '{$data['senha']}',
+    '{$data['tipo']}',
+    " . ($data['juros'] ? "'{$data['juros']}'" : 'NULL') . ",
+    " . ($data['limite_credito'] ? "'{$data['limite_credito']}'" : 'NULL') . ",
+    " . ($data['aniversario'] ? "'{$data['aniversario']}'" : 'NULL') . ",
+    NOW()
+);
+
+-- Dependente --
+INSERT INTO `nullbank`.`dependentes` (
+    `funcionario_id`,
+    `nome`,
+    `nascido_em`,
+    `parentesco`,
+    `idade`,
+    `created_at`
+) VALUES (
+    {$data['funcionario_id']},
+    '{$data['nome']}',
+    " . ($data['nascido_em'] ? "'{$data['nascido_em']}'" : 'NULL') . ",
+    '{$data['parentesco']}',
+    {$data['idade']},
+    NOW()
+);
+
+-- Endereco --
+INSERT INTO `nullbank`.`enderecos` (
+    `logradouro_tipo_id`,
+    `logradouro`,
+    `numero`,
+    `bairro`,
+    `cep`,
+    `cidade`,
+    `estado`,
+    `created_at`
+) VALUES (
+    {$data['logradouro_tipo_id']},
+    '{$data['logradouro']}',
+    '{$data['numero']}',
+    '{$data['bairro']}',
+    '{$data['cep']}',
+    '{$data['cidade']}',
+    '{$data['estado']}',
+    NOW()
+);
+
+-- Query para atualizar registros nas tabelas --
+
+-- Agencia --
+UPDATE `nullbank`.`agencias`
+SET
+  `nome` = '{$updateData['nome']}',
+  `endereco_id` = '{$updateData['endereco_id']}',
+  `montante_salarios` = '{$updateData['montante_salarios']}',
+  `updated_at` = NOW()
+WHERE
+  `id` = $this->id;
+
+-- Usuario --
+UPDATE `nullbank`.`usuarios`
+SET
+  `nome` = '{$updateData['nome']}',
+  `sobrenome` = '{$updateData['sobrenome']}',
+  `pronomes` = '{$updateData['pronomes']}',
+  `email` = '{$updateData['email']}',
+  `email_verified_at` = " . ($updateData['email_verified_at'] ? "'{$updateData['email_verified_at']}'" : 'NULL') . ",
+  `password` = '{$updateData['password']}',
+  `endereco_id` = '{$updateData['endereco_id']}',
+  `sexo` = '{$updateData['sexo']}',
+  `nascido_em` = " . ($updateData['nascido_em'] ? "'{$updateData['nascido_em']}'" : 'NULL') . ",
+  `remember_token` = '{$updateData['remember_token']}',
+  `updated_at` = NOW()
+WHERE
+  `id` = $this->id;
+
+-- Funcionario --
+UPDATE `nullbank`.`funcionarios`
+SET
+  `usuario_id` = '{$updateData['usuario_id']}',
+  `agencia_id` = '{$updateData['agencia_id']}',
+  `matricula` = '{$updateData['matricula']}',
+  `senha` = " . ($updateData['senha'] ? "'{$updateData['senha']}'" : 'NULL') . ",
+  `cargo` = " . ($updateData['cargo'] ? "'{$updateData['cargo']}'" : 'NULL') . ",
+  `salario` = " . ($updateData['salario'] ? "'{$updateData['salario']}'" : 'NULL') . ",
+  `updated_at` = NOW()
+WHERE
+  `id` = $this->id;
+
+-- Permissao --
+UPDATE `nullbank`.`permissoes`
+SET
+  `nome` = '{$updateData['nome']}'
+WHERE
+  `id` = $this->id;
+
+-- Transacao --
+UPDATE `nullbank`.`transacoes`
+SET
+  `conta_id` = '{$updateData['conta_id']}',
+  `tipo` = " . ($updateData['tipo'] ? "'{$updateData['tipo']}'" : 'NULL') . ",
+  `valor` = " . ($updateData['valor'] ? "'{$updateData['valor']}'" : 'NULL') . ",
+  `updated_at` = NOW()
+WHERE
+  `id` = $this->id;
+
+-- Cliente --
+UPDATE `nullbank`.`clientes`
+SET
+    `usuario_id` = '{$updateData['usuario_id']}',
+    `rg` = '{$updateData['rg']}',
+    `rg_emitido_por` = '{$updateData['rg_emitido_por']}',
+    `uf` = '{$updateData['uf']}',
+    `telefones` = " . ($updateData['telefones'] ? "'{$updateData['telefones']}'" : 'NULL') . ",
+    `emails` = " . ($updateData['emails'] ? "'{$updateData['emails']}'" : 'NULL') . ",
+    `updated_at` = NOW()
+WHERE
+    `cpf` = '{$this->cpf}';
+
+-- Conta --
+UPDATE `nullbank`.`contas`
+SET
+    `gerente_id` = '{$updateData['gerente_id']}',
+    `agencia_id` = '{$updateData['agencia_id']}',
+    `saldo` = '{$updateData['saldo']}',
+    `senha` = '{$updateData['senha']}',
+    `tipo` = '{$updateData['tipo']}',
+    `juros` = " . ($updateData['juros'] ? "'{$updateData['juros']}'" : 'NULL') . ",
+    `limite_credito` = " . ($updateData['limite_credito'] ? "'{$updateData['limite_credito']}'" : 'NULL') . ",
+    `aniversario` = " . ($updateData['aniversario'] ? "'{$updateData['aniversario']}'" : 'NULL') . ",
+    `updated_at` = NOW()
+WHERE
+    `id` = $this->id;
+
+-- Dependente --
+UPDATE `nullbank`.`dependentes`
+SET
+    `nome` = '{$updateData['nome']}',
+    `nascido_em` = " . ($updateData['nascido_em'] ? "'{$updateData['nascido_em']}'" : 'NULL') . ",
+    `parentesco` = '{$updateData['parentesco']}',
+    `idade` = '{$updateData['idade']}',
+    `updated_at` = NOW()
+WHERE
+    `id` = $this->id;
+
+-- Endereco --
+UPDATE `nullbank`.`enderecos`
+SET
+    `logradouro_tipo_id` = '{$updateData['logradouro_tipo_id']}',
+    `logradouro` = '{$updateData['logradouro']}',
+    `numero` = '{$updateData['numero']}',
+    `bairro` = '{$updateData['bairro']}',
+    `cep` = '{$updateData['cep']}',
+    `cidade` = '{$updateData['cidade']}',
+    `estado` = '{$updateData['estado']}',
+    `updated_at` = NOW()
+WHERE
+    `id` = $this->id;
+
+
+-- Query para excluir registros nas tabelas --
+
+-- Agencia --
+DELETE FROM `nullbank`.`agencias`
+WHERE `id` = $this->id;
+
+-- Usuario --
+DELETE FROM `nullbank`.`usuarios`
+WHERE `id` = $this->id;
+
+-- Funcionario --
+DELETE FROM `nullbank`.`funcionarios`
+WHERE `id` = $this->id;
+
+-- Permissao --
+DELETE FROM `nullbank`.`permissoes`
+WHERE `id` = $this->id;
+
+-- Transacao --
+DELETE FROM `nullbank`.`transacoes`
+WHERE `id` = $this->id;
+
+-- Cliente --
+DELETE FROM `nullbank`.`clientes`
+WHERE `cpf` = '{$this->cpf}';
+
+-- Conta --
+DELETE FROM `nullbank`.`contas`
+WHERE `id` = $this->id;
+
+-- Dependente --
+DELETE FROM `nullbank`.`dependentes`
+WHERE `id` = $this->id;
+
+-- Endereco --
+DELETE FROM `nullbank`.`enderecos`
+WHERE `id` = $this->id;
+
+-- Consultas SELECT para as entidades --
+
+-- Agencia --
+SELECT * FROM `nullbank`.`agencias` WHERE `agencias`.`id` = $id;
+
+-- Cliente --
+SELECT * FROM `nullbank`.`clientes` WHERE `clientes`.`cpf` = '$cpf';
+
+-- Conta --
+SELECT * FROM `nullbank`.`contas` WHERE `contas`.`id` = $id;
+
+-- Dependente --
+SELECT * FROM `nullbank`.`dependentes` WHERE `dependentes`.`id` = $id;
+
+-- Endereco --
+SELECT * FROM `nullbank`.`enderecos` WHERE `enderecos`.`id` = $id;
+
+-- Funcionario --
+SELECT * FROM `nullbank`.`funcionarios` WHERE `funcionarios`.`id` = $id;
+
+-- Permissao --
+SELECT * FROM `nullbank`.`permissoes` WHERE `permissoes`.`id` = $id;
+
+-- Transacao --
+SELECT * FROM `nullbank`.`transacoes` WHERE `transacoes`.`id` = $id;
+
+-- Usuario --
+SELECT * FROM `nullbank`.`usuarios` WHERE `usuarios`.`id` = $id;
