@@ -16,6 +16,8 @@ class CreateClientesTable implements NullBankMigration
               `uf` CHAR(2) NULL,
               `telefones` JSON NULL,
               `emails` JSON NULL,
+              `created_at` DATETIME NULL,
+              `updated_at` DATETIME NULL,
               PRIMARY KEY (`cpf`),
               INDEX `fk_clientes_usuarios1_idx` (`usuario_id` ASC) VISIBLE,
               UNIQUE INDEX `rg_UNIQUE` (`rg` ASC) VISIBLE,

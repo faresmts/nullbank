@@ -15,6 +15,8 @@ class CreateFuncionariosTable implements NullBankMigration
               `matricula` VARCHAR(45) NOT NULL,
               `cargo` ENUM('G', 'A', 'C') NULL,
               `salario` DECIMAL(8,2) NULL,
+              `created_at` DATETIME NULL,
+              `updated_at` DATETIME NULL,
               PRIMARY KEY (`id`),
               INDEX `fk_funcionarios_usuarios_idx` (`usuario_id` ASC) VISIBLE,
               INDEX `fk_funcionarios_agencias1_idx` (`agencia_id` ASC) VISIBLE,

@@ -2,15 +2,11 @@
 
 namespace App\NullBankModels;
 
-use App\Enums\UserPronoumEnum;
-use App\Enums\UserGenderEnum;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class Cliente implements NullBankModel
 {
-
     public function __construct(
         public string $cpf,
         public int $usuario_id,
@@ -18,14 +14,13 @@ class Cliente implements NullBankModel
         public string $rg_emitido_por,
         public string $uf,
         public array $telefones,
-        public array $emails
+        public array $emails,
+        public Carbon|string|null $created_at,
+        public Carbon|string|null $updated_at,
     ){}
 
     public static function create(array $data): Cliente
     {
-        $phones = isset($data['telefones']) ? json_encode($data['telefones']) : null;
-        $emails = isset($data['emails']) ? json_encode($data['emails']) : null;
-
         $query = "
             INSERT INTO `nullbank`.`clientes` (
                 `cpf`,
@@ -35,28 +30,28 @@ class Cliente implements NullBankModel
                 `uf`,
                 `telefones`,
                 `emails`,
+                `created_at`
             ) VALUES (
                 '{$data['cpf']}',
-                 {$data['usuario_id']},
+                {$data['usuario_id']},
                 '{$data['rg']}',
                 '{$data['rg_emitido_por']}',
                 '{$data['uf']}',
-                $phones,
-                $emails,
+                '" . json_encode($data['telefones']) . "',
+                '" . json_encode($data['emails']) . "',
+                NOW()
             );
         ";
 
         DB::insert($query);
 
-        $lastId = DB::getPdo()->lastInsertId();
-
-        return Cliente::first($lastId);
+        return Cliente::first($data['cpf']);
     }
 
-    public static function first(int $id): Cliente
+    public static function first(string $cpf): Cliente
     {
         $query = "
-            SELECT * FROM `nullbank`.`clientes` WHERE `clientes`.`cpf` = $id;
+            SELECT * FROM `nullbank`.`clientes` WHERE `clientes`.`cpf` = '{$cpf}';
         ";
 
         $data = DB::selectOne($query);
@@ -67,53 +62,48 @@ class Cliente implements NullBankModel
             $data->rg,
             $data->rg_emitido_por,
             $data->uf,
-            $data->telefones,
-            $data->emails
+            json_decode($data->telefones, true),
+            json_decode($data->emails, true),
+            $data->created_at,
+            $data->updated_at,
         );
     }
 
     public function update(array $data): NullBankModel
     {
-        $password = isset($data['password']) ? Hash::make($data['password']) : $this->password;
-
         $updateData = [
-            'nome' => $data['nome'] ?? $this->nome,
-            'sobrenome' => $data['sobrenome'] ?? $this->sobrenome,
-            'pronomes' => $data['pronomes'] ?? $this->pronomes,
-            'email' => $data['email'] ?? $this->email,
-            'password' => Hash::make($password),
-            'endereco_id' => $data['$this->endereco_id'] ?? $this->endereco_id,
-            'sexo' => $data['sexo'] ?? $this->sexo,
-            'nascido_em' => $data['nascido_em'] ?? $this->nascido_em,
-            'updated_at' => NOW()
+            'usuario_id' => $data['usuario_id'] ?? $this->usuario_id,
+            'rg' => $data['rg'] ?? $this->rg,
+            'rg_emitido_por' => $data['rg_emitido_por'] ?? $this->rg_emitido_por,
+            'uf' => $data['uf'] ?? $this->uf,
+            'telefones' => $data['telefones'] ?? $this->telefones,
+            'emails' => $data['emails'] ?? $this->emails,
         ];
 
         $query = "
             UPDATE `nullbank`.`clientes`
             SET
-              `nome` = '{$updateData['nome']}',
-              `sobrenome` = '{$updateData['sobrenome']}',
-              `pronomes` = '{$updateData['pronomes']}',
-              `email` = '{$updateData['email']}',
-              `password` = '{$updateData['password']}',
-              `endereco_id` = '{$updateData['endereco_id']}',
-              `sexo` = '{$updateData['sexo']}',
-              `nascido_em` = '{$updateData['nascido_em']}',
-              `updated_at` = '{$updateData['updated_at']}'
+              `usuario_id` = '{$updateData['usuario_id']}',
+              `rg` = '{$updateData['rg']}',
+              `rg_emitido_por` = '{$updateData['rg_emitido_por']}',
+              `uf` = '{$updateData['uf']}',
+              `telefones` = '" . json_encode($updateData['telefones']) . "',
+              `emails` = '" . json_encode($updateData['emails']) . "',
+              `updated_at` = NOW()
             WHERE
-              `id` = $this->id;
+              `cpf` = '{$this->cpf}';
         ";
 
         DB::update($query);
 
-        return Cliente::first($this->id);
+        return Cliente::first($this->cpf);
     }
 
     public function delete(): int
     {
         $query = "
             DELETE FROM `nullbank`.`clientes`
-            WHERE `id` = $this->id;
+            WHERE `cpf` = '{$this->cpf}';
         ";
 
         return DB::delete($query);
