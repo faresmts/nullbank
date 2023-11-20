@@ -262,10 +262,17 @@ CREATE TABLE IF NOT EXISTS `nullbank`.`cliente_conta` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+--                    CONSTRAINTS
+-- -----------------------------------------------------
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+-- -----------------------------------------------------
+-- Table `nullbank`.`funcionarios`
+-- -----------------------------------------------------
+ALTER TABLE funcionarios
+ADD CONSTRAINT salarioBase CHECK (salario > 2286);
+
+
 
 -- Queries de Manipulação de Dados --
 
@@ -611,3 +618,4 @@ SELECT * FROM `nullbank`.`transacoes` WHERE `transacoes`.`id` = $id;
 
 -- Usuario --
 SELECT * FROM `nullbank`.`usuarios` WHERE `usuarios`.`id` = $id;
+
