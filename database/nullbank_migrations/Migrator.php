@@ -7,6 +7,7 @@ class Migrator
     public static function classes(): array
     {
         return [
+            // Tables
             CreateLogradouroTiposTable::class,
             CreateEnderecosTable::class,
             CreateAgenciasTable::class,
@@ -15,10 +16,35 @@ class Migrator
             CreateDependentesTable::class,
             CreateClientesTable::class,
             CreateContasTable::class,
-            CreateClienteContaTable::class,
             CreateTransacoesTable::class,
             CreatePermissoesTable::class,
-            CreateUsuarioPermissaoTable::class
+            CreateUsuarioPermissaoTable::class,
+            CreateTelefonesTable::class,
+            CreateEmailsTable::class,
+            CreateClienteContaTable::class,
+
+            // Constraints
+            AlterFuncionariosTableAddConstraint::class,
+
+            // Triggers
+            BeforeInsertDependenteTriggerIdade::class,
+            BeforeInsertDependenteTriggerMaximoCincoDependentes::class,
+
+            BeforeInsertContaTriggerGerenteDaMesmaAgencia::class,
+            BeforeInsertContaTriggerTiposDeConta::class,
+            BeforeUpdateContaTriggerTiposDeConta::class,
+
+            AfterInsertFuncionarioTriggerMontanteSalarios::class,
+            AfterUpdateFuncionarioTriggerMontanteSalarios::class,
+            AfterDeleteFuncionarioTriggerMontanteSalarios::class,
+
+            AfterInsertTransacaoTriggerAtualizarSaldoECredito::class,
+            BeforeInsertTransacaoTriggerSaldoECreditoNaoPodemFicarNegativados::class,
+            BeforeDeleteTransacaoTriggerBloquearDelecoes::class,
+            BeforeUpdateTransacaoTriggerBloquearAlteracoes::class,
+
+            BeforeInsertClienteContaTriggerNoMaximoDoisClientesPorConta::class,
+            BeforeInsertClienteContaTriggerNoMaximoUmaContaPorAgencia::class,
         ];
     }
 }

@@ -11,7 +11,8 @@ class CreateTransacoesTable implements NullBankMigration
             CREATE TABLE IF NOT EXISTS `nullbank`.`transacoes` (
               `id` INT NOT NULL AUTO_INCREMENT,
               `conta_id` INT NOT NULL,
-              `tipo` ENUM('S', 'D', 'P', 'E', 'T') NOT NULL,
+              `origem` ENUM('Saldo', 'Credito') NOT NULL,
+              `tipo` ENUM('Saque', 'Deposito', 'Pagamento', 'Estorno', 'Transferencia') NOT NULL,
               `valor` DECIMAL(12,2) NOT NULL,
               `created_at` DATETIME NULL,
               `updated_at` DATETIME NULL,
