@@ -20,7 +20,7 @@ class BeforeInsertClienteContaTriggerNoMaximoDoisClientesPorConta implements Nul
                 WHERE conta_id = NEW.conta_id;
 
                 -- Se a contagem for maior que 2, impedir a inserção
-                IF total_clientes > 2 THEN
+                IF total_clientes >= 2 THEN
                     SIGNAL SQLSTATE '45000'
                         SET MESSAGE_TEXT = 'A conta já possui o número máximo de clientes permitido (2)';
                 END IF;

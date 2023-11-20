@@ -8,7 +8,8 @@ class AfterInsertFuncionarioTriggerMontanteSalarios implements NullBankMigration
     public function migrate(): string
     {
         return "
-            CREATE TRIGGER trigger_update_montante_salarios_insert AFTER INSERT ON funcionarios
+            CREATE TRIGGER trigger_update_montante_salarios_insert
+                AFTER INSERT ON funcionarios
                 FOR EACH ROW
             BEGIN
                 DECLARE total_salarios DECIMAL(10,2);

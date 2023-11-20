@@ -14,8 +14,6 @@ class CreateClientesTable implements NullBankMigration
               `rg` VARCHAR(15) NULL,
               `rg_emitido_por` VARCHAR(45) NULL,
               `uf` CHAR(2) NULL,
-              `telefones` JSON NULL,
-              `emails` JSON NULL,
               `created_at` DATETIME NULL,
               `updated_at` DATETIME NULL,
               PRIMARY KEY (`cpf`),

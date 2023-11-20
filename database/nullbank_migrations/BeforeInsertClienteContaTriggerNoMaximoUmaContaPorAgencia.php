@@ -8,7 +8,7 @@ class BeforeInsertClienteContaTriggerNoMaximoUmaContaPorAgencia implements NullB
     public function migrate(): string
     {
         return "
-            CREATE TRIGGER trigger_verifica_agencia_conta_cliente
+            CREATE TRIGGER trigger_no_maximo_uma_conta_por_agencia
                 BEFORE INSERT ON cliente_conta
                 FOR EACH ROW
             BEGIN

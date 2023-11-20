@@ -8,7 +8,7 @@ class BeforeInsertTransacaoTriggerSaldoECreditoNaoPodemFicarNegativados implemen
     public function migrate(): string
     {
         return "
-            CREATE TRIGGER trigger_saldo_e_credito_nao_podem_ficar_negativados_insert
+            CREATE TRIGGER trigger_saldo_e_credito_nao_podem_ficar_negativados
                 BEFORE INSERT ON transacoes
                 FOR EACH ROW
             BEGIN
