@@ -13,7 +13,7 @@ class CreateContasTable implements NullBankMigration
               `agencia_id` INT NOT NULL,
               `gerente_id` INT NOT NULL,
               `saldo` DECIMAL(12,2) NOT NULL DEFAULT 0,
-              `senha` VARCHAR(45) NOT NULL,
+              `senha` VARCHAR(100) NOT NULL,
               `tipo` ENUM('CC', 'CP', 'CE') NOT NULL,
               `juros` DECIMAL(5,2) NULL DEFAULT 0,
               `limite_credito` DECIMAL(10,2) NULL DEFAULT 0,
