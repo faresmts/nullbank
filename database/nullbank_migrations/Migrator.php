@@ -23,9 +23,6 @@ class Migrator
             CreateEmailsTable::class,
             CreateClienteContaTable::class,
 
-            // Constraints
-            AlterFuncionariosTableAddConstraint::class,
-
             // Triggers
             BeforeInsertDependenteTriggerIdade::class,
             BeforeInsertDependenteTriggerMaximoCincoDependentes::class,
@@ -34,6 +31,7 @@ class Migrator
             BeforeInsertContaTriggerTiposDeConta::class,
             BeforeUpdateContaTriggerTiposDeConta::class,
 
+            BeforeInsertFuncionariosTriggerSalario::class,
             AfterInsertFuncionarioTriggerMontanteSalarios::class,
             AfterUpdateFuncionarioTriggerMontanteSalarios::class,
             AfterDeleteFuncionarioTriggerMontanteSalarios::class,

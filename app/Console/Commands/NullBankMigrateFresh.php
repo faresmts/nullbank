@@ -29,20 +29,20 @@ class NullBankMigrateFresh extends Command
     public function handle(): void
     {
         $dropQueries = [
-            "DROP TABLE cliente_conta",
-            "DROP TABLE dependentes",
-            "DROP TABLE emails",
-            "DROP TABLE telefones",
-            "DROP TABLE clientes",
-            "DROP TABLE transacoes",
-            "DROP TABLE contas",
-            "DROP TABLE funcionarios",
-            "DROP TABLE agencias",
-            "DROP TABLE usuario_permissao",
-            "DROP TABLE permissoes",
-            "DROP TABLE usuarios",
-            "DROP TABLE enderecos",
-            "DROP TABLE logradouro_tipos",
+            "DROP TABLE IF EXISTS cliente_conta",
+            "DROP TABLE IF EXISTS dependentes",
+            "DROP TABLE IF EXISTS emails",
+            "DROP TABLE IF EXISTS telefones",
+            "DROP TABLE IF EXISTS clientes",
+            "DROP TABLE IF EXISTS transacoes",
+            "DROP TABLE IF EXISTS contas",
+            "DROP TABLE IF EXISTS funcionarios",
+            "DROP TABLE IF EXISTS agencias",
+            "DROP TABLE IF EXISTS usuario_permissao",
+            "DROP TABLE IF EXISTS permissoes",
+            "DROP TABLE IF EXISTS usuarios",
+            "DROP TABLE IF EXISTS enderecos",
+            "DROP TABLE IF EXISTS logradouro_tipos",
         ];
 
         foreach ($dropQueries as $drop) {
