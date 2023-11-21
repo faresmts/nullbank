@@ -13,8 +13,8 @@ class Cliente implements NullBankModel
         public string $rg,
         public string $rg_emitido_por,
         public string $uf,
-        public array $telefones,
-        public array $emails,
+        public array|null $emails,
+        public array|null $telefones,
         public Carbon|string|null $created_at,
         public Carbon|string|null $updated_at,
     ){}
@@ -28,8 +28,6 @@ class Cliente implements NullBankModel
                 `rg`,
                 `rg_emitido_por`,
                 `uf`,
-                `telefones`,
-                `emails`,
                 `created_at`
             ) VALUES (
                 '{$data['cpf']}',
@@ -37,21 +35,42 @@ class Cliente implements NullBankModel
                 '{$data['rg']}',
                 '{$data['rg_emitido_por']}',
                 '{$data['uf']}',
-                '" . json_encode($data['telefones']) . "',
-                '" . json_encode($data['emails']) . "',
                 NOW()
             );
         ";
 
         DB::insert($query);
 
+        if (isset($data['emails'])) {
+            $this->insertEmails($data['emails']);
+        }
+
+//        if (isset($data['emails'])) {
+//            $queryEmails = "
+//                INSERT INTO `nullbank`.`emails` (endereco, clientes_cpf, descricao) VALUES
+//            ";
+//
+//            foreach ($data['emails'] as $key => $email) {
+//
+//                $address = $email['endereco'];
+//                $cpf = $email['clientes_cpf']
+//
+//                if ($key == count($data['emails']) - 1) {
+//                    $query .= "($userId, $permissionId);";
+//                    break;
+//                }
+//
+//                $queryEmails .=
+//            }
+//        }
+
         return Cliente::first($data['cpf']);
     }
 
-    public static function first(string $cpf): Cliente
+    public static function first(int $cpf): Cliente
     {
         $query = "
-            SELECT * FROM `nullbank`.`clientes` WHERE `clientes`.`cpf` = '{$cpf}';
+            SELECT * FROM `nullbank`.`clientes` WHERE `clientes`.`cpf` = '$cpf';
         ";
 
         $data = DB::selectOne($query);
@@ -62,8 +81,6 @@ class Cliente implements NullBankModel
             $data->rg,
             $data->rg_emitido_por,
             $data->uf,
-            json_decode($data->telefones, true),
-            json_decode($data->emails, true),
             $data->created_at,
             $data->updated_at,
         );
@@ -76,19 +93,15 @@ class Cliente implements NullBankModel
             'rg' => $data['rg'] ?? $this->rg,
             'rg_emitido_por' => $data['rg_emitido_por'] ?? $this->rg_emitido_por,
             'uf' => $data['uf'] ?? $this->uf,
-            'telefones' => $data['telefones'] ?? $this->telefones,
-            'emails' => $data['emails'] ?? $this->emails,
         ];
 
         $query = "
             UPDATE `nullbank`.`clientes`
             SET
-              `usuario_id` = '{$updateData['usuario_id']}',
+              `usuario_id` = {$updateData['usuario_id']},
               `rg` = '{$updateData['rg']}',
               `rg_emitido_por` = '{$updateData['rg_emitido_por']}',
               `uf` = '{$updateData['uf']}',
-              `telefones` = '" . json_encode($updateData['telefones']) . "',
-              `emails` = '" . json_encode($updateData['emails']) . "',
               `updated_at` = NOW()
             WHERE
               `cpf` = '{$this->cpf}';

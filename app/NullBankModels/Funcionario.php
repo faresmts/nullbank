@@ -12,9 +12,9 @@ class Funcionario implements NullBankModel
         public int $usuario_id,
         public int $agencia_id,
         public string $matricula,
-        public string|null $senha,
-        public string|null $cargo,
-        public float|null $salario,
+        public string $senha,
+        public string $cargo,
+        public float $salario,
         public Carbon|string|null $created_at,
         public Carbon|string|null $updated_at,
     ){}
@@ -34,9 +34,9 @@ class Funcionario implements NullBankModel
                 {$data['usuario_id']},
                 {$data['agencia_id']},
                 '{$data['matricula']}',
-                " . ($data['senha'] ? "'{$data['senha']}'" : 'NULL') . ",
-                " . ($data['cargo'] ? "'{$data['cargo']}'" : 'NULL') . ",
-                " . ($data['salario'] ? "'{$data['salario']}'" : 'NULL') . ",
+                '{$data['senha']}',
+                '{$data['cargo']}',
+                {$data['salario']},
                 NOW()
             );
         ";
@@ -83,12 +83,12 @@ class Funcionario implements NullBankModel
         $query = "
             UPDATE `nullbank`.`funcionarios`
             SET
-              `usuario_id` = '{$updateData['usuario_id']}',
-              `agencia_id` = '{$updateData['agencia_id']}',
+              `usuario_id` = {$updateData['usuario_id']},
+              `agencia_id` = {$updateData['agencia_id']},
               `matricula` = '{$updateData['matricula']}',
-              `senha` = " . ($updateData['senha'] ? "'{$updateData['senha']}'" : 'NULL') . ",
-              `cargo` = " . ($updateData['cargo'] ? "'{$updateData['cargo']}'" : 'NULL') . ",
-              `salario` = " . ($updateData['salario'] ? "'{$updateData['salario']}'" : 'NULL') . ",
+              `senha` = '{$updateData['senha']}',
+              `cargo` = '{$updateData['cargo']}',
+              `salario` = {$updateData['salario']},
               `updated_at` = NOW()
             WHERE
               `id` = $this->id;

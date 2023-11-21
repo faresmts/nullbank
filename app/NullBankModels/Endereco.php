@@ -88,7 +88,7 @@ class Endereco implements NullBankModel
         $query = "
             UPDATE `nullbank`.`enderecos`
             SET
-              `logradouro_tipo_id` = '{$updateData['logradouro_tipo_id']}',
+              `logradouro_tipo_id` = {$updateData['logradouro_tipo_id']},
               `logradouro` = '{$updateData['logradouro']}',
               `numero` = '{$updateData['numero']}',
               `bairro` = '{$updateData['bairro']}',

@@ -11,9 +11,9 @@ class Dependente implements NullBankModel
         public int $id,
         public int $funcionario_id,
         public string $nome,
-        public Carbon|string|null $nascido_em,
+        public Carbon|string $nascido_em,
         public string $parentesco,
-        public int|null $idade,
+        public ?int $idade,
         public Carbon|string|null $created_at,
         public Carbon|string|null $updated_at,
     ){}
@@ -31,9 +31,9 @@ class Dependente implements NullBankModel
             ) VALUES (
                 {$data['funcionario_id']},
                 '{$data['nome']}',
-                " . ($data['nascido_em'] ? "'{$data['nascido_em']}'" : 'NULL') . ",
+                '{$data['nascido_em']}',
                 '{$data['parentesco']}',
-                " . ($data['idade'] ? $data['idade'] : 'NULL') . ",
+                {$data['idade']},
                 NOW()
             );
         ";
@@ -42,13 +42,13 @@ class Dependente implements NullBankModel
 
         $lastId = DB::getPdo()->lastInsertId();
 
-        return Dependente::first($lastId, $data['funcionario_id']);
+        return Dependente::first($lastId);
     }
 
-    public static function first(int $id, int $funcionario_id): Dependente
+    public static function first(int $id): Dependente
     {
         $query = "
-            SELECT * FROM `nullbank`.`dependentes` WHERE `dependentes`.`id` = $id AND `dependentes`.`funcionario_id` = $funcionario_id;
+            SELECT * FROM `nullbank`.`dependentes` WHERE `dependentes`.`id` = $id;
         ";
 
         $data = DB::selectOne($query);
@@ -78,11 +78,11 @@ class Dependente implements NullBankModel
         $query = "
             UPDATE `nullbank`.`dependentes`
             SET
-              `funcionario_id` = '{$updateData['funcionario_id']}',
+              `funcionario_id` = {$updateData['funcionario_id']},
               `nome` = '{$updateData['nome']}',
-              `nascido_em` = " . ($updateData['nascido_em'] ? "'{$updateData['nascido_em']}'" : 'NULL') . ",
+              `nascido_em` = '{$updateData['nascido_em']}',
               `parentesco` = '{$updateData['parentesco']}',
-              `idade` = " . ($updateData['idade'] ? $updateData['idade'] : 'NULL') . ",
+              `idade` = {$updateData['idade']},
               `updated_at` = NOW()
             WHERE
               `id` = $this->id;
@@ -90,14 +90,14 @@ class Dependente implements NullBankModel
 
         DB::update($query);
 
-        return Dependente::first($this->id, $updateData['funcionario_id']);
+        return Dependente::first($this->id);
     }
 
     public function delete(): int
     {
         $query = "
             DELETE FROM `nullbank`.`dependentes`
-            WHERE `id` = $this->id AND `funcionario_id` = $this->funcionario_id;
+            WHERE `id` = $this->id;
         ";
 
         return DB::delete($query);
