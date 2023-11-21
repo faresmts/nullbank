@@ -10,8 +10,9 @@ class Transacao implements NullBankModel
     public function __construct(
         public int $id,
         public int $conta_id,
-        public string|null $tipo,
-        public float|null $valor,
+        public string $origem,
+        public string $tipo,
+        public float $valor,
         public Carbon|string|null $created_at,
         public Carbon|string|null $updated_at,
     ){}
@@ -21,12 +22,14 @@ class Transacao implements NullBankModel
         $query = "
             INSERT INTO `nullbank`.`transacoes` (
                 `conta_id`,
+                `origem`,
                 `tipo`,
                 `valor`,
                 `created_at`
             ) VALUES (
                 {$data['conta_id']},
-                {$data['tipo']},
+                '{$data['origem']}',
+                '{$data['tipo']}',
                 {$data['valor']},
                 NOW()
             );
@@ -50,6 +53,7 @@ class Transacao implements NullBankModel
         return new Transacao(
             $data->id,
             $data->conta_id,
+            $data->origem,
             $data->tipo,
             $data->valor,
             $data->created_at,
@@ -61,6 +65,7 @@ class Transacao implements NullBankModel
     {
         $updateData = [
             'conta_id' => $data['conta_id'] ?? $this->conta_id,
+            'origem' => $data['origem'] ?? $this->origem,
             'tipo' => $data['tipo'] ?? $this->tipo,
             'valor' => $data['valor'] ?? $this->valor,
         ];
@@ -68,9 +73,10 @@ class Transacao implements NullBankModel
         $query = "
             UPDATE `nullbank`.`transacoes`
             SET
-              `conta_id` = '{$updateData['conta_id']}',
+              `conta_id` = {$updateData['conta_id']},
+              `origem` = '{$updateData['origem']}',
               `tipo` = '{$updateData['tipo']}',
-              `valor` = '{$updateData['valor']}',
+              `valor` = {$updateData['valor']},
               `updated_at` = NOW()
             WHERE
               `id` = $this->id;

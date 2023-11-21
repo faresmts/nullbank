@@ -70,4 +70,23 @@ class Permissao implements NullBankModel
 
         return DB::delete($query);
     }
+
+    public static function attach(array $usuarioPermissoes): bool
+    {
+        $query = "INSERT INTO `nullbank`.`usuario_permissao` (usuarios_id, permissoes_id) VALUES ";
+
+        foreach ($usuarioPermissoes as $key => $usuarioPermissao) {
+            $userId = $usuarioPermissao[0];
+            $permissionId = $usuarioPermissao[1];
+
+            if ($key == count($usuarioPermissoes) - 1) {
+                $query .= "($userId, $permissionId);";
+                break;
+            }
+
+            $query .= "($userId, $permissionId), ";
+        }
+
+        return DB::insert($query);
+    }
 }
