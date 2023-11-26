@@ -51,7 +51,7 @@ class Endereco implements NullBankModel
         return Endereco::first($lastId);
     }
 
-    public static function first(int $id): Endereco
+    public static function first(int|string $id): Endereco
     {
         $query = "
             SELECT * FROM `nullbank`.`enderecos` WHERE `enderecos`.`id` = $id;

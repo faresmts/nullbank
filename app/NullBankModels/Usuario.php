@@ -62,7 +62,7 @@ class Usuario implements NullBankModel
         return Usuario::first($lastId);
     }
 
-    public static function first(int $id): Usuario
+    public static function first(int|string $id): Usuario
     {
         $query = "
             SELECT * FROM `nullbank`.`usuarios` WHERE `usuarios`.`id` = $id;
@@ -130,6 +130,22 @@ class Usuario implements NullBankModel
             WHERE `id` = $this->id;
         ";
 
+        $permissionsDeleteQuery = "
+            DELETE FROM `nullbank`.`usuario_permissao`
+            WHERE `usuarios_id` = $this->id;
+        ";
+
+        DB::delete($permissionsDeleteQuery);
+
         return DB::delete($query);
+    }
+
+    public static function attach(string|int $usuarioId, string|int $permissaoId): bool
+    {
+        $query = "INSERT INTO `nullbank`.`usuario_permissao` (usuarios_id, permissoes_id)
+                    VALUES ($usuarioId, $permissaoId)
+        ";
+
+        return DB::insert($query);
     }
 }

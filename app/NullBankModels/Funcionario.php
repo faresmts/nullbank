@@ -4,6 +4,7 @@ namespace App\NullBankModels;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class Funcionario implements NullBankModel
 {
@@ -21,6 +22,8 @@ class Funcionario implements NullBankModel
 
     public static function create(array $data): Funcionario
     {
+        $password = Hash::make($data['senha']);
+
         $query = "
             INSERT INTO `nullbank`.`funcionarios` (
                 `usuario_id`,
@@ -34,7 +37,7 @@ class Funcionario implements NullBankModel
                 {$data['usuario_id']},
                 {$data['agencia_id']},
                 '{$data['matricula']}',
-                '{$data['senha']}',
+                '$password',
                 '{$data['cargo']}',
                 {$data['salario']},
                 NOW()
@@ -48,7 +51,7 @@ class Funcionario implements NullBankModel
         return Funcionario::first($lastId);
     }
 
-    public static function first(int $id): Funcionario
+    public static function first(int|string $id): Funcionario
     {
         $query = "
             SELECT * FROM `nullbank`.`funcionarios` WHERE `funcionarios`.`id` = $id;
@@ -71,11 +74,13 @@ class Funcionario implements NullBankModel
 
     public function update(array $data): NullBankModel
     {
+        $password = isset($data['senha']) ? Hash::make($data['senha']) : $this->senha;
+
         $updateData = [
             'usuario_id' => $data['usuario_id'] ?? $this->usuario_id,
             'agencia_id' => $data['agencia_id'] ?? $this->agencia_id,
             'matricula' => $data['matricula'] ?? $this->matricula,
-            'senha' => $data['senha'] ?? $this->senha,
+            'senha' => $password,
             'cargo' => $data['cargo'] ?? $this->cargo,
             'salario' => $data['salario'] ?? $this->salario,
         ];

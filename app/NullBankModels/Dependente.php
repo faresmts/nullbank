@@ -26,14 +26,12 @@ class Dependente implements NullBankModel
                 `nome`,
                 `nascido_em`,
                 `parentesco`,
-                `idade`,
                 `created_at`
             ) VALUES (
                 {$data['funcionario_id']},
                 '{$data['nome']}',
                 '{$data['nascido_em']}',
                 '{$data['parentesco']}',
-                {$data['idade']},
                 NOW()
             );
         ";
@@ -45,7 +43,7 @@ class Dependente implements NullBankModel
         return Dependente::first($lastId);
     }
 
-    public static function first(int $id): Dependente
+    public static function first(int|string $id): Dependente
     {
         $query = "
             SELECT * FROM `nullbank`.`dependentes` WHERE `dependentes`.`id` = $id;

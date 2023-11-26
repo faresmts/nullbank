@@ -13,7 +13,7 @@ class BeforeDeleteTransacaoTriggerBloquearDelecoes implements NullBankMigration
                 FOR EACH ROW
             BEGIN
                 SIGNAL SQLSTATE '45000'
-                    SET MESSAGE_TEXT = 'Atualizações nesta tabela são bloqueadas';
+                    SET MESSAGE_TEXT = 'Deleções nesta tabela são bloqueadas';
             END;
         ";
     }

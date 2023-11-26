@@ -42,7 +42,7 @@ class Transacao implements NullBankModel
         return Transacao::first($lastId);
     }
 
-    public static function first(int $id): Transacao
+    public static function first(int|string $id): Transacao
     {
         $query = "
             SELECT * FROM `nullbank`.`transacoes` WHERE `transacoes`.`id` = $id;

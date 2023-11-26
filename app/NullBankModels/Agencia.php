@@ -22,12 +22,10 @@ class Agencia implements NullBankModel
             INSERT INTO `nullbank`.`agencias` (
                 `nome`,
                 `endereco_id`,
-                `montante_salarios`,
                 `created_at`
             ) VALUES (
                 '{$data['nome']}',
                 {$data['endereco_id']},
-                '{$data['montante_salarios']}',
                 NOW()
             );
         ";
@@ -39,7 +37,7 @@ class Agencia implements NullBankModel
         return Agencia::first($lastId);
     }
 
-    public static function first(int $id): Agencia
+    public static function first(int|string $id): Agencia
     {
         $query = "
             SELECT * FROM `nullbank`.`agencias` WHERE `agencias`.`id` = $id;
@@ -62,7 +60,6 @@ class Agencia implements NullBankModel
         $updateData = [
             'nome' => $data['nome'] ?? $this->nome,
             'endereco_id' => $data['$this->endereco_id'] ?? $this->endereco_id,
-            'montante_salarios' => $data['montante_salarios'] ?? $this->montante_salarios,
         ];
 
         $query = "
@@ -70,7 +67,6 @@ class Agencia implements NullBankModel
             SET
               `nome` = '{$updateData['nome']}',
               `endereco_id` = '{$updateData['endereco_id']}',
-              `montante_salarios` = '{$updateData['montante_salarios']}',
               `updated_at` = NOW()
             WHERE
               `id` = $this->id;
