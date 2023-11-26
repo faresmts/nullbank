@@ -2,14 +2,16 @@
 
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\AgenciaController;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Passwords\Confirm;
 use App\Livewire\Auth\Passwords\Email;
 use App\Livewire\Auth\Passwords\Reset;
 use App\Livewire\Auth\Register;
 use App\Livewire\Auth\Verify;
-use App\NullBankModels\Usuario;
-use http\Client\Curl\User;
+use App\NullBankModels\Cliente;
+use App\NullBankModels\Conta;
+use App\NullBankModels\Transacao;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,25 +26,42 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $user = Usuario::first(2);
-    $new = $user->delete();
-    dd($new);
+    $data = [
+        'cpf' => '05641459109',
+        'usuario_id' => 1,
+        'rg' => '123123',
+        'rg_emitido_por' => 'SSP',
+        'uf' => 'DG',
+        'emails' => [
+            0 => [
+                'descricao' => 'Testezinho',
+                'endereco' => 'fares@stargrid.pro'
+            ],
+            1 => [
+                'descricao' => 'Testezinho2',
+                'endereco' => 'fares2@stargrid.pro'
+            ],
+        ],
+        'telefones' => [
+            0 => [
+                'descricao' => 'Testezinho',
+                'numero' => '88993842429'
+            ],
+            1 => [
+                'descricao' => 'Testezinho2',
+                'numero' => '88993842422'
+            ],
+        ],
+    ];
 
-//    $data = [
-//        'nome' => 'Maria',
-//        'sobrenome' => 'Naiane Moita',
-//        'pronomes' => 'ela/dela',
-//        'email' => 'nai@stargrid.pro',
-//        'password' => 'nai@123',
-//        'endereco_id' => '1',
-//        'sexo' => 'F',
-//        'nascido_em' => now()->toDateTimeString(),
-//        'created_at' => now()->toDateTimeString(),
-//    ];
-//
-//    $user2 = Usuario::create($data);
+//    dd(Cliente::create($data));
 
-    dd($user2);
+    $a = Cliente::first('05641459109');
+//    dd(Cliente::attach(4, 2, '05641459109'));
+
+//    dd($a->update([]));
+
+    dd($a->delete());
 
     return 'teste';
 })->name('home');

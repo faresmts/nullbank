@@ -38,7 +38,7 @@ class Migrator
 
             AfterInsertTransacaoTriggerAtualizarSaldoECredito::class,
             BeforeInsertTransacaoTriggerSaldoECreditoNaoPodemFicarNegativados::class,
-            BeforeDeleteTransacaoTriggerBloquearDelecoes::class,
+//            BeforeDeleteTransacaoTriggerBloquearDelecoes::class,
             BeforeUpdateTransacaoTriggerBloquearAlteracoes::class,
 
             BeforeInsertClienteContaTriggerNoMaximoDoisClientesPorConta::class,

@@ -28,7 +28,7 @@ class Permissao implements NullBankModel
         return Permissao::first($lastId);
     }
 
-    public static function first(int $id): Permissao
+    public static function first(int|string $id): Permissao
     {
         $query = "
             SELECT * FROM `nullbank`.`permissoes` WHERE `permissoes`.`id` = $id;
@@ -68,24 +68,21 @@ class Permissao implements NullBankModel
             WHERE `id` = $this->id;
         ";
 
+        $permissionsDeleteQuery = "
+            DELETE FROM `nullbank`.`usuario_permissao`
+            WHERE `permissoes_id` = $this->id;
+        ";
+
+        DB::delete($permissionsDeleteQuery);
+
         return DB::delete($query);
     }
 
-    public static function attach(array $usuarioPermissoes): bool
+    public static function attach(string|int $usuarioId, string|int $permissaoId): bool
     {
-        $query = "INSERT INTO `nullbank`.`usuario_permissao` (usuarios_id, permissoes_id) VALUES ";
-
-        foreach ($usuarioPermissoes as $key => $usuarioPermissao) {
-            $userId = $usuarioPermissao[0];
-            $permissionId = $usuarioPermissao[1];
-
-            if ($key == count($usuarioPermissoes) - 1) {
-                $query .= "($userId, $permissionId);";
-                break;
-            }
-
-            $query .= "($userId, $permissionId), ";
-        }
+        $query = "INSERT INTO `nullbank`.`usuario_permissao` (usuarios_id, permissoes_id)
+                    VALUES ($usuarioId, $permissaoId);
+        ";
 
         return DB::insert($query);
     }
