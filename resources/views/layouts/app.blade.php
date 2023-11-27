@@ -4,7 +4,7 @@
 
     @include('layouts.nav')
 
-    <div class="sm:ml-auto">
+    <div class="sm:ml-64">
         @yield('content')
 
         @isset($slot)

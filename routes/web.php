@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AgenciaController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,8 @@ Route::resource('/users', UsuarioController::class)->names('customers');
 Route::post('/users/login', [ UsuarioController::class, 'login' ])->name('users.login');
 
 Route::get('/register', [ UsuarioController::class, 'register' ])->name('customers.register');
+
+Route::resource('/agencies', AgenciaController::class)->names('agencies');
 
 //Route::middleware('guest')->group(function () {
 //    Route::get('login', Login::class)

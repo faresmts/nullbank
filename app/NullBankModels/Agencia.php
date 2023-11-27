@@ -3,6 +3,7 @@
 namespace App\NullBankModels;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class Agencia implements NullBankModel
@@ -11,7 +12,7 @@ class Agencia implements NullBankModel
         public int $id,
         public string $nome,
         public int $endereco_id,
-        public float $montante_salarios,
+        public float|null $montante_salarios,
         public Carbon|string|null $created_at,
         public Carbon|string|null $updated_at,
     ){}
@@ -85,5 +86,33 @@ class Agencia implements NullBankModel
         ";
 
         return DB::delete($query);
+    }
+
+    public static function all(string|null $search = ''): Collection
+    {
+        $query = "SELECT * FROM `nullbank`.`agencias`";
+
+        if ($search) {
+            $query = "SELECT * FROM `nullbank`.`agencias` WHERE nome LIKE '%$search%'";
+        }
+
+        $agenciasData = DB::select($query);
+
+        $agenciasCollection = new Collection();
+
+        foreach ($agenciasData as $data) {
+            $agencia = new Agencia(
+                $data->id,
+                $data->nome,
+                $data->endereco_id,
+                $data->montante_salarios,
+                $data->created_at,
+                $data->updated_at,
+            );
+
+            $agenciasCollection->push($agencia);
+        }
+
+        return $agenciasCollection;
     }
 }
