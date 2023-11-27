@@ -1,9 +1,18 @@
 @extends('layouts.base')
 
 @section('body')
-    @yield('content')
-    
-    @isset($slot)
-        {{ $slot }}
-    @endisset
+
+    @include('layouts.nav')
+
+    <div class="sm:ml-auto">
+        @yield('content')
+
+        @isset($slot)
+            {{ $slot }}
+        @endisset
+    </div>
+
+
+
+
 @endsection
