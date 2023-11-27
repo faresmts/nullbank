@@ -24,6 +24,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
+        <script src="https://kit.fontawesome.com/8eb8d3b41a.js" crossorigin="anonymous"></script>
     </head>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
