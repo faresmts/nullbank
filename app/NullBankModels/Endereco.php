@@ -114,4 +114,15 @@ class Endereco implements NullBankModel
 
         return DB::delete($query);
     }
+
+    public static function getLogradourosTipos(): array
+    {
+        $query = "
+            SELECT * FROM `nullbank`.`logradouro_tipos`;
+        ";
+
+        $results = DB::select($query);
+
+        return $results;
+    }
 }

@@ -43,6 +43,9 @@ class Migrator
 
             BeforeInsertClienteContaTriggerNoMaximoDoisClientesPorConta::class,
             BeforeInsertClienteContaTriggerNoMaximoUmaContaPorAgencia::class,
+
+            // Seeder
+            InsertLogradouroTipos::class
         ];
     }
 }
