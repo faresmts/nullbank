@@ -2,7 +2,10 @@
 
 namespace App\NullBankModels;
 
+use App\Enums\UserGenderEnum;
+use App\Enums\UserPronoumEnum;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
@@ -18,6 +21,16 @@ class Cliente implements NullBankModel
         public array|null|stdClass $telefones,
         public Carbon|string|null $created_at,
         public Carbon|string|null $updated_at,
+        public string $nome,
+        public string $sobrenome,
+        public UserPronoumEnum|string $pronomes,
+        public string $email,
+        public Carbon|string|null $email_verified_at,
+        public string $password,
+        public int $endereco_id,
+        public UserGenderEnum|string $sexo,
+        public Carbon|string $nascido_em,
+        public string|null $remember_token,
     ){}
 
     public static function create(array $data): Cliente
@@ -62,6 +75,30 @@ class Cliente implements NullBankModel
             SELECT * FROM `nullbank`.`clientes` WHERE `clientes`.`cpf` = '$cpf';
         ";
 
+        $query = "
+            SELECT
+                `clientes`.`cpf` AS `cliente_cpf`,
+                `usuarios`.`id` AS `usuario_id`,
+                `rg`,
+                `rg_emitido_por`,
+                `uf`,
+                `clientes`.`created_at` AS `cliente_created_at`,
+                `clientes`.`updated_at` AS `cliente_updated_at`,
+                `nome`,
+                `sobrenome`,
+                `pronomes`,
+                `email`,
+                `email_verified_at`,
+                `password`,
+                `endereco_id`,
+                `sexo`,
+                `nascido_em`,
+                `remember_token`
+            FROM `nullbank`.`clientes`
+            INNER JOIN `nullbank`.`usuarios` ON `clientes`.`usuario_id` = `usuarios`.`id`
+            WHERE `clientes`.`cpf` = $cpf
+            ";
+
         $data = DB::selectOne($query);
 
         $emailsQuery = "SELECT * FROM `nullbank`.`emails` WHERE `emails`.`clientes_cpf` = '$cpf'";
@@ -73,15 +110,25 @@ class Cliente implements NullBankModel
         $telefones = DB::select($telefonesQuery);
 
         return new Cliente(
-            $data->cpf,
+            $data->cliente_cpf,
             $data->usuario_id,
             $data->rg,
             $data->rg_emitido_por,
             $data->uf,
             $emails,
             $telefones,
-            $data->created_at,
-            $data->updated_at,
+            $data->cliente_created_at,
+            $data->cliente_updated_at,
+            $data->nome,
+            $data->sobrenome,
+            $data->pronomes,
+            $data->email,
+            $data->email_verified_at,
+            $data->password,
+            $data->endereco_id,
+            $data->sexo,
+            $data->nascido_em,
+            $data->remember_token,
         );
     }
 
@@ -137,9 +184,16 @@ class Cliente implements NullBankModel
         Cliente::deleteTelefones($this->cpf);
         Cliente::deleteContas($this->cpf);
 
+        $result = DB::delete($query);
+
+        $user = Usuario::first($this->usuario_id);
+        $user->delete();
+        $address = Endereco::first($user->endereco_id);
+        $address->delete();
+
         DB::commit();
 
-        return DB::delete($query);
+        return $result;
     }
 
     private static function insertEmails(string|int $cpf, array $emails): void
@@ -207,5 +261,85 @@ class Cliente implements NullBankModel
         }
 
         DB::commit();
+    }
+
+    public static function all(string|null $search = ''): Collection
+    {
+        $query = "
+        SELECT
+            `clientes`.`cpf` AS `cliente_cpf`,
+            `usuarios`.`id` AS `usuario_id`,
+            `rg`,
+            `rg_emitido_por`,
+            `uf`,
+            `clientes`.`created_at` AS `cliente_created_at`,
+            `clientes`.`updated_at` AS `cliente_updated_at`,
+            `nome`,
+            `sobrenome`,
+            `pronomes`,
+            `email`,
+            `email_verified_at`,
+            `password`,
+            `endereco_id`,
+            `sexo`,
+            `nascido_em`,
+            `remember_token`
+        FROM `nullbank`.`clientes`
+        INNER JOIN `nullbank`.`usuarios` ON `clientes`.`usuario_id` = `usuarios`.`id`";
+
+        if ($search) {
+            $query .= " WHERE `usuarios`.`nome` LIKE '%$search%' OR `usuarios`.`sobrenome` LIKE '%$search%'";
+        }
+
+        $clientesData = DB::select($query);
+
+        $clientesCollection = new Collection();
+
+        foreach ($clientesData as $data) {
+            $emailsQuery = "SELECT * FROM `nullbank`.`emails` WHERE `emails`.`clientes_cpf` = '$data->cliente_cpf'";
+
+            $emails = DB::select($emailsQuery);
+
+            $telefonesQuery = "SELECT * FROM `nullbank`.`telefones` WHERE `telefones`.`clientes_cpf` = '$data->cliente_cpf'";
+
+            $telefones = DB::select($telefonesQuery);
+
+            $cliente = new Cliente(
+                $data->cliente_cpf,
+                $data->usuario_id,
+                $data->rg,
+                $data->rg_emitido_por,
+                $data->uf,
+                $emails,
+                $telefones,
+                $data->cliente_created_at,
+                $data->cliente_updated_at,
+                $data->nome,
+                $data->sobrenome,
+                $data->pronomes,
+                $data->email,
+                $data->email_verified_at,
+                $data->password,
+                $data->endereco_id,
+                $data->sexo,
+                $data->nascido_em,
+                $data->remember_token,
+            );
+
+            $clientesCollection->push($cliente);
+        }
+
+        return $clientesCollection;
+    }
+
+    public function totalDeContas(): int
+    {
+        $query = "
+            SELECT COUNT(*) AS total_contas FROM cliente_conta WHERE cliente_cpf = $this->cpf
+        ";
+
+        $result = DB::selectOne($query);
+
+        return $result->total_contas;
     }
 }

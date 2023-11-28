@@ -19,7 +19,7 @@ use Illuminate\View\View;
 
 class FuncionarioController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $search = $request->has('search') ? $request->input('search') : null;
 
