@@ -3,7 +3,9 @@
 namespace App\NullBankModels;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 class Endereco implements NullBankModel
 {
@@ -124,5 +126,76 @@ class Endereco implements NullBankModel
         $results = DB::select($query);
 
         return $results;
+    }
+
+    public static function getLogradourosTipo(string|int $id)
+    {
+        $query = "
+            SELECT * FROM `nullbank`.`logradouro_tipos` WHERE `logradouro_tipos`.`id` = $id;
+        ";
+
+        return DB::selectOne($query);
+    }
+
+    public static function all(string|null $search = ''): Collection
+    {
+        $query = "SELECT * FROM `nullbank`.`enderecos`";
+
+        if ($search) {
+            $query = "SELECT * FROM `nullbank`.`enderecos`
+                        WHERE `enderecos`.`logradouro` LIKE '%$search%'
+            ";
+        }
+
+        $enderecosData = DB::select($query);
+
+        $enderecosCollection = new Collection();
+
+        foreach ($enderecosData as $data) {
+            $endereco = new Endereco(
+                $data->id,
+                $data->logradouro_tipo_id,
+                $data->logradouro,
+                $data->numero,
+                $data->bairro,
+                $data->cep,
+                $data->cidade,
+                $data->estado,
+                $data->created_at,
+                $data->updated_at,
+            );
+
+            $enderecosCollection->push($endereco);
+        }
+
+        return $enderecosCollection;
+    }
+
+    public function belongsTo(): NullBankModel|null
+    {
+        $query = "
+            SELECT
+                enderecos.id AS endereco_id,
+                agencias.id AS agencia_id,
+                agencias.nome AS agencia_nome,
+                usuarios.id AS usuario_id,
+                usuarios.nome AS usuario_nome
+            FROM enderecos
+            LEFT JOIN agencias ON enderecos.id = agencias.endereco_id
+            LEFT JOIN usuarios ON enderecos.id = usuarios.endereco_id
+            WHERE enderecos.id = $this->id;
+        ";
+
+        $result = DB::selectOne($query);
+
+        if ($result) {
+            if ($result->usuario_id !== null) {
+                return Usuario::first($result->usuario_id);
+            } elseif ($result->agencia_id !== null) {
+                return Agencia::first($result->agencia_id);
+            }
+        }
+
+        return null;
     }
 }
