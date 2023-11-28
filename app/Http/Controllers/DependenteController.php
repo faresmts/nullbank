@@ -2,63 +2,82 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\DependenteDTO;
+use App\DTOs\EnderecoDTO;
+use App\DTOs\FuncionarioDTO;
+use App\DTOs\UsuarioDTO;
+use App\NullBankModels\Agencia;
+use App\NullBankModels\Dependente;
+use App\NullBankModels\Endereco;
+use App\NullBankModels\Funcionario;
+use App\NullBankModels\Usuario;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class DependenteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request): View
     {
-        //
+        $search = $request->has('search') ? $request->input('search') : null;
+
+        $allDependants = Dependente::all($search);
+
+        $employees = Funcionario::all();
+
+        $perPage = $request->input('perPage', 10);
+
+        $currentPage = Paginator::resolveCurrentPage();
+        $currentPageItems = $allDependants->slice(($currentPage - 1) * $perPage, $perPage)->values();
+
+        $dependants = new LengthAwarePaginator(
+            $currentPageItems,
+            $allDependants->count(),
+            $perPage,
+            $currentPage,
+            ['path' => Paginator::resolveCurrentPath()]
+        );
+
+        return view('nullbank.dependants.index')
+            ->with('dependants', $dependants)
+            ->with('employees', $employees);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): RedirectResponse
     {
-        //
+        $dependantDto = DependenteDTO::fromRequest($request);
+        Dependente::create($dependantDto->toArray());
+
+        return redirect()->route('dependants.index');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function edit(string $id): View
     {
-        //
+        $employees = Funcionario::all();
+        $dependant = Dependente::first($id);
+
+        return view('nullbank.dependants.edit')
+            ->with('dependant', $dependant)
+            ->with('employees', $employees);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(Request $request, int $id): RedirectResponse
     {
-        //
+        $dependant = Dependente::first($id);
+        $dependantDto = DependenteDTO::fromRequest($request);
+        $dependant->update($dependantDto->toArray());
+
+        return redirect()->route('dependants.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy(string $id): RedirectResponse
     {
-        //
-    }
+        $dependant = Dependente::first($id);
+        $dependant->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('dependants.index');
     }
 }

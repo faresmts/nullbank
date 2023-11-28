@@ -3,6 +3,7 @@
 namespace App\NullBankModels;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class Dependente implements NullBankModel
@@ -99,5 +100,35 @@ class Dependente implements NullBankModel
         ";
 
         return DB::delete($query);
+    }
+
+    public static function all(string|null $search = ''): Collection
+    {
+        $query = "SELECT * FROM `nullbank`.`dependentes`";
+
+        if ($search) {
+            $query = "SELECT * FROM `nullbank`.`dependentes` WHERE nome LIKE '%$search%'";
+        }
+
+        $dependentesData = DB::select($query);
+
+        $dependentesCollection = new Collection();
+
+        foreach ($dependentesData as $data) {
+            $dependente = new Dependente(
+                $data->id,
+                $data->funcionario_id,
+                $data->nome,
+                $data->nascido_em,
+                $data->parentesco,
+                $data->idade,
+                $data->created_at,
+                $data->updated_at,
+            );
+
+            $dependentesCollection->push($dependente);
+        }
+
+        return $dependentesCollection;
     }
 }
