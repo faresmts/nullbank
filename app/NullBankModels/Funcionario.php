@@ -230,4 +230,69 @@ class Funcionario implements NullBankModel
 
         return $funcionariosCollection;
     }
+
+    public static function allManagers(string|null $search = ''): Collection
+    {
+        $query = "
+        SELECT
+            `funcionarios`.`id` AS `funcionario_id`,
+            `usuarios`.`id` AS `usuario_id`,
+            `agencia_id`,
+            `matricula`,
+            `senha`,
+            `cargo`,
+            `salario`,
+            `funcionarios`.`created_at` AS `funcionario_created_at`,
+            `funcionarios`.`updated_at` AS `funcionario_updated_at`,
+            `nome`,
+            `sobrenome`,
+            `pronomes`,
+            `email`,
+            `email_verified_at`,
+            `password`,
+            `endereco_id`,
+            `sexo`,
+            `nascido_em`,
+            `remember_token`
+        FROM `nullbank`.`funcionarios`
+        INNER JOIN `nullbank`.`usuarios` ON `funcionarios`.`usuario_id` = `usuarios`.`id`
+        WHERE funcionarios.cargo = 'G'
+        ";
+
+        if ($search) {
+            $query .= " WHERE `usuarios`.`nome` LIKE '%$search%' OR `usuarios`.`sobrenome` LIKE '%$search%'";
+        }
+
+        $funcionariosData = DB::select($query);
+
+        $funcionariosCollection = new Collection();
+
+        foreach ($funcionariosData as $data) {
+            $funcionario = new Funcionario(
+                $data->funcionario_id,
+                $data->usuario_id,
+                $data->agencia_id,
+                $data->matricula,
+                $data->senha,
+                $data->cargo,
+                $data->salario,
+                $data->funcionario_created_at,
+                $data->funcionario_updated_at,
+                $data->nome,
+                $data->sobrenome,
+                $data->pronomes,
+                $data->email,
+                $data->email_verified_at,
+                $data->password,
+                $data->endereco_id,
+                $data->sexo,
+                $data->nascido_em,
+                $data->remember_token,
+            );
+
+            $funcionariosCollection->push($funcionario);
+        }
+
+        return $funcionariosCollection;
+    }
 }

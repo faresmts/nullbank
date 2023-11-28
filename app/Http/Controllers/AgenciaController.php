@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\DTOs\AgenciaDTO;
 use App\DTOs\EnderecoDTO;
 use App\NullBankModels\Agencia;
+use App\NullBankModels\Conta;
 use App\NullBankModels\Endereco;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

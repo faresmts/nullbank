@@ -3,6 +3,7 @@
 namespace App\NullBankModels;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -153,5 +154,73 @@ class Conta implements NullBankModel
         DB::commit();
 
         return $return;
+    }
+
+    public static function all(string|null $search = ''): Collection
+    {
+        $query = "SELECT * FROM `nullbank`.`contas`";
+
+        if ($search) {
+            $query = "SELECT * FROM `nullbank`.`contas` WHERE id = $search";
+        }
+
+        $contasData = DB::select($query);
+
+        $contasCollection = new Collection();
+
+        foreach ($contasData as $data) {
+            $conta = new Conta(
+                $data->id,
+                $data->agencia_id,
+                $data->gerente_id,
+                $data->saldo,
+                $data->senha,
+                $data->tipo,
+                $data->juros,
+                $data->limite_credito,
+                $data->credito_usado,
+                $data->aniversario,
+                $data->created_at,
+                $data->updated_at,
+            );
+
+            $contasCollection->push($conta);
+        }
+
+        return $contasCollection;
+    }
+
+    public function getClientes(): Collection
+    {
+        $query = "
+            SELECT * FROM cliente_conta WHERE conta_id = $this->id;
+        ";
+
+        $result = DB::select($query);
+
+        $clientesCollection = new Collection();
+
+        if (count($result) == 1) {
+            $cliente1 = Cliente::first($result[0]->cliente_cpf);
+            $clientesCollection->push($cliente1);
+        }
+
+        if (count($result) == 2) {
+            $cliente1 = Cliente::first($result[0]->cliente_cpf);
+            $cliente2 = Cliente::first($result[1]->cliente_cpf);
+
+            $clientesCollection->push($cliente1, $cliente2);
+        }
+
+        return $clientesCollection;
+    }
+
+    public static function attach(string|int $contaId, string|int $agenciaId, string|int $clienteCPF): bool
+    {
+        $query = "INSERT INTO `nullbank`.`cliente_conta` (conta_id, agencia_id, cliente_cpf)
+                    VALUES ($contaId, $agenciaId, '$clienteCPF');
+        ";
+
+        return DB::insert($query);
     }
 }

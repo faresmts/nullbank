@@ -88,7 +88,7 @@
                             <tr>
                                 <th scope="col" class="p-4">Tipo de Logradouro</th>
                                 <th scope="col" class="p-4">Logradouro</th>
-                                <th scope="col" class="p-4">Número</th>
+                                <th scope="col" class="p-4">Numero</th>
                                 <th scope="col" class="p-4">Bairro</th>
                                 <th scope="col" class="p-4 text-center">CEP</th>
                                 <th scope="col" class="p-4 text-center">Cidade</th>
