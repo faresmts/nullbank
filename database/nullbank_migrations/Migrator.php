@@ -34,7 +34,7 @@ class Migrator
             BeforeInsertFuncionariosTriggerSalario::class,
             AfterInsertFuncionarioTriggerMontanteSalarios::class,
             AfterUpdateFuncionarioTriggerMontanteSalarios::class,
-            AfterDeleteFuncionarioTriggerMontanteSalarios::class,
+            BeforeDeleteFuncionarioTriggerMontanteSalarios::class,
 
             AfterInsertTransacaoTriggerAtualizarSaldoECredito::class,
             BeforeInsertTransacaoTriggerSaldoECreditoNaoPodemFicarNegativados::class,

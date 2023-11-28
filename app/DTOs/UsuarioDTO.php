@@ -16,7 +16,7 @@ class UsuarioDTO implements DTO
         public string $sobrenome,
         public UserPronoumEnum|string $pronomes,
         public string $email,
-        public string $password,
+        public ?string $password,
         public int|null $endereco_id,
         public UserGenderEnum|string $sexo,
         public Carbon|string $nascido_em,

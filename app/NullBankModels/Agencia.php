@@ -80,12 +80,19 @@ class Agencia implements NullBankModel
 
     public function delete(): int
     {
+        $address = Endereco::first($this->endereco_id);
+
         $query = "
             DELETE FROM `nullbank`.`agencias`
             WHERE `id` = $this->id;
         ";
 
-        return DB::delete($query);
+        DB::beginTransaction();
+            $return  = DB::delete($query);
+            $address->delete();
+        DB::commit();
+
+        return $return;
     }
 
     public static function all(string|null $search = ''): Collection

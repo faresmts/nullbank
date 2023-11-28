@@ -2,14 +2,14 @@
 
 namespace Database\NullBankMigrations;
 
-class AfterDeleteFuncionarioTriggerMontanteSalarios implements NullBankMigration
+class BeforeDeleteFuncionarioTriggerMontanteSalarios implements NullBankMigration
 {
 
     public function migrate(): string
     {
         return "
             CREATE TRIGGER trigger_update_montante_salarios_delete
-                AFTER DELETE ON funcionarios
+                BEFORE DELETE ON funcionarios
                 FOR EACH ROW
             BEGIN
                 DECLARE total_salarios DECIMAL(10,2);
@@ -19,7 +19,7 @@ class AfterDeleteFuncionarioTriggerMontanteSalarios implements NullBankMigration
                 WHERE agencia_id = OLD.agencia_id;
 
                 UPDATE agencias
-                SET montante_salarios = total_salarios
+                SET montante_salarios = total_salarios - OLD.salario
                 WHERE id = OLD.agencia_id;
             END;
         ";
