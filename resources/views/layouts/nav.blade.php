@@ -21,6 +21,15 @@
                     </a>
                 </li>
             </ul>
+
+            <ul class="space-y-2 font-medium">
+                <li>
+                    <a href=" {{ route('employees.index') }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 {{ request()->routeIs('employees.*') ? 'bg-gray-100' : '' }} dark:hover:bg-gray-700 group">
+                        <i class="w-5 h-5 ml-0.5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 {{ request()->routeIs('employees.*') ? 'text-gray-900' : '' }} dark:group-hover:text-white fa-solid fa-people-group"></i>
+                        <span class="ms-3">Funcionários</span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </aside>
 

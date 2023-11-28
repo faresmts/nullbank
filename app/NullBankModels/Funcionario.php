@@ -2,7 +2,10 @@
 
 namespace App\NullBankModels;
 
+use App\Enums\UserGenderEnum;
+use App\Enums\UserPronoumEnum;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -18,6 +21,16 @@ class Funcionario implements NullBankModel
         public float $salario,
         public Carbon|string|null $created_at,
         public Carbon|string|null $updated_at,
+        public string $nome,
+        public string $sobrenome,
+        public UserPronoumEnum|string $pronomes,
+        public string $email,
+        public Carbon|string|null $email_verified_at,
+        public string $password,
+        public int $endereco_id,
+        public UserGenderEnum|string $sexo,
+        public Carbon|string $nascido_em,
+        public string|null $remember_token,
     ){}
 
     public static function create(array $data): Funcionario
@@ -54,21 +67,53 @@ class Funcionario implements NullBankModel
     public static function first(int|string $id): Funcionario
     {
         $query = "
-            SELECT * FROM `nullbank`.`funcionarios` WHERE `funcionarios`.`id` = $id;
-        ";
+            SELECT
+                `funcionarios`.`id` AS `funcionario_id`,
+                `usuarios`.`id` AS `usuario_id`,
+                `agencia_id`,
+                `matricula`,
+                `senha`,
+                `cargo`,
+                `salario`,
+                `funcionarios`.`created_at` AS `funcionario_created_at`,
+                `funcionarios`.`updated_at` AS `funcionario_updated_at`,
+                `nome`,
+                `sobrenome`,
+                `pronomes`,
+                `email`,
+                `email_verified_at`,
+                `password`,
+                `endereco_id`,
+                `sexo`,
+                `nascido_em`,
+                `remember_token`
+            FROM `nullbank`.`funcionarios`
+            INNER JOIN `nullbank`.`usuarios` ON `funcionarios`.`usuario_id` = `usuarios`.`id`
+            WHERE `funcionarios`.`id` = $id
+            ";
 
         $data = DB::selectOne($query);
 
         return new Funcionario(
-            $data->id,
+            $data->funcionario_id,
             $data->usuario_id,
             $data->agencia_id,
             $data->matricula,
             $data->senha,
             $data->cargo,
             $data->salario,
-            $data->created_at,
-            $data->updated_at,
+            $data->funcionario_created_at,
+            $data->funcionario_updated_at,
+            $data->nome,
+            $data->sobrenome,
+            $data->pronomes,
+            $data->email,
+            $data->email_verified_at,
+            $data->password,
+            $data->endereco_id,
+            $data->sexo,
+            $data->nascido_em,
+            $data->remember_token,
         );
     }
 
@@ -106,11 +151,83 @@ class Funcionario implements NullBankModel
 
     public function delete(): int
     {
+        $user = Usuario::first($this->usuario_id);
+        $address = Endereco::first($user->endereco_id);
+
         $query = "
             DELETE FROM `nullbank`.`funcionarios`
             WHERE `id` = $this->id;
         ";
 
-        return DB::delete($query);
+        DB::beginTransaction();
+        $return = DB::delete($query);
+        $user->delete();
+        $address->delete();
+        DB::commit();
+
+        return $return;
+    }
+
+    public static function all(string|null $search = ''): Collection
+    {
+        $query = "
+        SELECT
+            `funcionarios`.`id` AS `funcionario_id`,
+            `usuarios`.`id` AS `usuario_id`,
+            `agencia_id`,
+            `matricula`,
+            `senha`,
+            `cargo`,
+            `salario`,
+            `funcionarios`.`created_at` AS `funcionario_created_at`,
+            `funcionarios`.`updated_at` AS `funcionario_updated_at`,
+            `nome`,
+            `sobrenome`,
+            `pronomes`,
+            `email`,
+            `email_verified_at`,
+            `password`,
+            `endereco_id`,
+            `sexo`,
+            `nascido_em`,
+            `remember_token`
+        FROM `nullbank`.`funcionarios`
+        INNER JOIN `nullbank`.`usuarios` ON `funcionarios`.`usuario_id` = `usuarios`.`id`";
+
+        if ($search) {
+            $query .= " WHERE `usuarios`.`nome` LIKE '%$search%' OR `usuarios`.`sobrenome` LIKE '%$search%'";
+        }
+
+        $funcionariosData = DB::select($query);
+
+        $funcionariosCollection = new Collection();
+
+        foreach ($funcionariosData as $data) {
+            $funcionario = new Funcionario(
+                $data->funcionario_id,
+                $data->usuario_id,
+                $data->agencia_id,
+                $data->matricula,
+                $data->senha,
+                $data->cargo,
+                $data->salario,
+                $data->funcionario_created_at,
+                $data->funcionario_updated_at,
+                $data->nome,
+                $data->sobrenome,
+                $data->pronomes,
+                $data->email,
+                $data->email_verified_at,
+                $data->password,
+                $data->endereco_id,
+                $data->sexo,
+                $data->nascido_em,
+                $data->remember_token,
+            );
+
+            $funcionariosCollection->push($funcionario);
+        }
+
+        return $funcionariosCollection;
     }
 }
