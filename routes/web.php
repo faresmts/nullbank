@@ -24,19 +24,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/admin', 'nullbank.admin')->name('admin');
 Route::post('/admin/login', [ LoginController::class, 'admin' ])->name('admin.login');
-
 Route::view('/employee', 'nullbank.employee')->name('employee');
 Route::post('/employee/login', [ LoginController::class, 'employee' ])->name('employee.login');
-
 Route::view('/', 'nullbank.login')->name('customer');
 Route::post('/login', [LoginController::class, 'login'])->name('customer.login');
-
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
-
-//Route::resource('/users', UsuarioController::class)->names('users');
-//Route::post('/users/login', [ LoginController::class, 'login' ])->name('users.login');
-
-//Route::get('/register', [ UsuarioController::class, 'register' ])->name('customers.register');
 
 Route::middleware([NullbankAuth::class])->group(function () {
     Route::resource('/agencies', AgenciaController::class)->names('agencies');

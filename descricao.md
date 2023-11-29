@@ -74,3 +74,22 @@
   - tipo da transação (saque, depósito, pagamento, estorno ou transferência),
   - data-hora 
   - valor
+
+# Funcionamento do Sistema
+- solicitando “Usuário” e “Senha” de acesso ao BD logo na tela inicial.
+- três níveis de acesso: 
+  - Um de administrador/DBA (sempre com login: Admin e senha: Root), que deve manter o cadastro
+  (inserção, remoção, alteração) de todas as entidades / tabelas (descritas acima), além de poder fazer
+  todas as consultas disponíveis no sistema. O usuário DBA deverá ser capaz de ter acesso total e
+  irrestrito ao sistema, podendo realizar toda e qualquer operação.
+  
+
+- Deve existir um controle de login dos funcionários, que é feito a partir da matrícula e da senha,
+  onde: 
+  - cada gerente só terá acesso (leitura e/ou escrita) aos dados das contas que o mesmo gerencia,
+  - atendentes / funcionários só terão acesso de leitura aos números e saldos das contas de
+    sua mesma agência, mas os caixas têm acesso irrestrito às transações das contas de sua agência,
+    podendo efetuar operações sobre as mesmas.
+  
+
+- No caso de cliente com mais de uma conta, o mesmo deve selecionar qual a conta a ser acessada após o login com CPF e senha.

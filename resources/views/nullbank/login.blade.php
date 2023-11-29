@@ -50,6 +50,11 @@
 {{--                            Não tem uma conta ainda? <a href="#" class="font-medium text-blue-600 hover:underline dark:text-blue-500">Cadastre-se já!</a>--}}
 {{--                        </p>--}}
                     </form>
+
+                    <div class="flex justify-between">
+                        <a href="{{ route('employee') }}" class="text-sm text-blue-600 hover:underline dark:text-blue-500">Acesso para Funcionários</a>
+                        <a href="{{ route('admin') }}" class="text-sm text-blue-600 hover:underline dark:text-blue-500">Acesso para Administradores</a>
+                    </div>
                 </div>
 
 
