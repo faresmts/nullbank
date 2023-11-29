@@ -9,7 +9,7 @@ class ContaDTO implements DTO
 {
     public function __construct(
         public int $agencia_id,
-        public int $gerente_id,
+        public ?int $gerente_id,
         public ?string $senha,
         public string $tipo,
         public float|null $juros,

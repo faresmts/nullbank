@@ -245,4 +245,47 @@ class Conta implements NullBankModel
 
         return DB::delete($query);
     }
+
+    public static function allFromManager(int $managerId, string|null $search = ''): Collection
+    {
+        $query = "SELECT contas.*
+                    FROM funcionarios AS gerentes
+                    JOIN contas ON gerentes.id = contas.gerente_id
+                    WHERE gerentes.id = $managerId;
+        ";
+
+        if ($search) {
+            $query = "
+                SELECT contas.*
+                    FROM funcionarios AS gerentes
+                    JOIN contas ON gerentes.id = contas.gerente_id
+                    WHERE gerentes.id = $managerId AND contas.id = $search;
+            ";
+        }
+
+        $contasData = DB::select($query);
+
+        $contasCollection = new Collection();
+
+        foreach ($contasData as $data) {
+            $conta = new Conta(
+                $data->id,
+                $data->agencia_id,
+                $data->gerente_id,
+                $data->saldo,
+                $data->senha,
+                $data->tipo,
+                $data->juros,
+                $data->limite_credito,
+                $data->credito_usado,
+                $data->aniversario,
+                $data->created_at,
+                $data->updated_at,
+            );
+
+            $contasCollection->push($conta);
+        }
+
+        return $contasCollection;
+    }
 }

@@ -15,13 +15,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
-class ContaController extends Controller
+class ManagerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request): View|RedirectResponse
+
+    public function accounts(Request $request): View|RedirectResponse
     {
+        $manager = Funcionario::first($_SESSION['user_id']);
+
         if ($_SESSION['user_type'] == 'customer') {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
@@ -29,10 +29,9 @@ class ContaController extends Controller
 
         $search = $request->has('search') ? $request->input('search') : null;
 
-        $allAccounts = Conta::all($search);
+        $allAccounts = Conta::allFromManager($manager->id, $search);
 
         $agencies = Agencia::all();
-        $managers = Funcionario::allManagers();
         $customers = Cliente::all();
 
         $perPage = $request->input('perPage', 10);
@@ -48,40 +47,36 @@ class ContaController extends Controller
             ['path' => Paginator::resolveCurrentPath()]
         );
 
-        return view('nullbank.accounts.index')
+        return view('nullbank.managers.accounts.index')
             ->with('agencies', $agencies)
-            ->with('managers', $managers)
+            ->with('manager', $manager)
             ->with('accounts', $accounts)
             ->with('customers', $customers);
-    }
+   }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
+    public function createAccount(Request $request): RedirectResponse
     {
         if ($_SESSION['user_type'] == 'customer') {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
         }
 
-        DB::beginTransaction();
-            $accountDto = ContaDTO::fromRequest($request);
-            $account = Conta::create($accountDto->toArray());
-            $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf'));
+        $manager = Funcionario::first($_SESSION['user_id']);
 
-            if ($request->input('cpf-2')) {
-                $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf-2'));
-            }
+        DB::beginTransaction();
+        $accountDto = ContaDTO::fromRequest($request);
+        $account = Conta::create($accountDto->toArray());
+        $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf'));
+
+        if ($request->input('cpf-2')) {
+            $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf-2'));
+        }
         DB::commit();
 
-        return redirect()->route('accounts.index');
+        return redirect()->route('managers.accounts.index', $manager->id);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id): View|RedirectResponse
+    public function editAccount(string $managerid, string $id): View|RedirectResponse
     {
         if ($_SESSION['user_type'] == 'customer') {
             Session::flash('error', 'Acesso não permitido!');
@@ -90,12 +85,12 @@ class ContaController extends Controller
 
         $account = Conta::first($id);
         $agencies = Agencia::all();
-        $managers = Funcionario::allManagers();
+        $manager = Funcionario::first($_SESSION['user_id']);
         $customers = Cliente::all();
 
-        return view('nullbank.accounts.edit')
+        return view('nullbank.managers.accounts.edit')
             ->with('agencies', $agencies)
-            ->with('managers', $managers)
+            ->with('manager', $manager)
             ->with('account', $account)
             ->with('customers', $customers);
     }
@@ -103,46 +98,51 @@ class ContaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id): RedirectResponse
+    public function updateAccount(Request $request, string $managerid, string $id): RedirectResponse
     {
         if ($_SESSION['user_type'] == 'customer') {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
         }
 
+        $manager = Funcionario::first($_SESSION['user_id']);
+
         $account = Conta::first($id);
 
         DB::beginTransaction();
-            $accountDto = ContaDTO::fromRequest($request);
-            $account->update($accountDto->toArray());
-            $account->dettach();
-            $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf'));
+        $accountDto = ContaDTO::fromRequest($request);
+        $accountDto->gerente_id = $manager->id;
+        $account->update($accountDto->toArray());
+        $account->dettach();
+        $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf'));
 
-            if ($request->input('cpf-2')) {
-                $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf-2'));
-            }
+        if ($request->input('cpf-2')) {
+            $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf-2'));
+        }
         DB::commit();
 
-        return redirect()->route('accounts.index');
+        return redirect()->route('managers.accounts.index', $manager->id);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id): RedirectResponse
+    public function deleteAccount(string $managerid, string $id): RedirectResponse
     {
         if ($_SESSION['user_type'] == 'customer') {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
         }
 
+        $manager = Funcionario::first($_SESSION['user_id']);
+
         $account = Conta::first($id);
 
         DB::beginTransaction();
-            $account->dettach();
-            $account->delete();
+        $account->dettach();
+        $account->delete();
         DB::commit();
 
-        return redirect()->route('accounts.index');
+        return redirect()->route('managers.accounts.index', $manager->id);
     }
 }

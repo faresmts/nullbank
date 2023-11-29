@@ -6,6 +6,7 @@ use App\Http\Controllers\ContaController;
 use App\Http\Controllers\DependenteController;
 use App\Http\Controllers\EnderecoController;
 use App\Http\Controllers\FuncionarioController;
+use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\TransacaoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Middleware\NullbankAuth;
@@ -32,7 +33,6 @@ Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware([NullbankAuth::class])->group(function () {
     Route::resource('/agencies', AgenciaController::class)->names('agencies');
-
     Route::resource('/employees', FuncionarioController::class)->names('employees');
 
     Route::resource('/customers', ClienteController::class)->names('customers');
@@ -44,17 +44,22 @@ Route::middleware([NullbankAuth::class])->group(function () {
     });
 
     Route::resource('/accounts', ContaController::class)->names('accounts');
-
     Route::resource('/dependants', DependenteController::class)->names('dependants');
-
     Route::resource('/addresses', EnderecoController::class)->names('addresses');
-
     Route::resource('/transactions', TransacaoController::class)->names('transactions');
 
+    Route::group([
+        'prefix' => 'managers',
+    ], function ($route) {
+        Route::get('/{manager}/accounts', [ManagerController::class, 'accounts'])->name('managers.accounts.index');;
+        Route::post('/{manager}/accounts', [ManagerController::class, 'createAccount'])->name('managers.accounts.store');;
+        Route::get('/{manager}/accounts/{account}', [ManagerController::class, 'editAccount'])->name('managers.accounts.edit');;
+        Route::put('/{manager}/accounts/{account}', [ManagerController::class, 'updateAccount'])->name('managers.accounts.update');;
+        Route::delete('/{manager}/accounts/{account}', [ManagerController::class, 'deleteAccount'])->name('managers.accounts.destroy');;
+    });
+
     Route::view('/home', 'nullbank.home')->name('home');
-
     Route::view('/new-account', 'nullbank.new-account')->name('new-account');
-
     Route::get('/account-selected/{account}', [LoginController::class, 'accountSelected'])->name('customer.account-selected');
 });
 

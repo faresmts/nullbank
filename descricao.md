@@ -86,10 +86,13 @@
 
 - Deve existir um controle de login dos funcionários, que é feito a partir da matrícula e da senha,
   onde: 
-  - cada gerente só terá acesso (leitura e/ou escrita) aos dados das contas que o mesmo gerencia,
-  - atendentes / funcionários só terão acesso de leitura aos números e saldos das contas de
-    sua mesma agência, mas os caixas têm acesso irrestrito às transações das contas de sua agência,
-    podendo efetuar operações sobre as mesmas.
-  
+  - gerentes
+    - acesso (leitura e/ou escrita) aos dados das contas que o mesmo gerencia
+    - acesso de leitura aos números e saldos das contas de sua mesma agência
+  - atendentes 
+    - acesso de leitura aos números e saldos das contas de sua mesma agência
+  - caixas
+    - acesso irrestrito às transações das contas de sua agência podendo efetuar operações sobre as mesmas
+    - acesso de leitura aos números e saldos das contas de sua mesma agência
 
 - No caso de cliente com mais de uma conta, o mesmo deve selecionar qual a conta a ser acessada após o login com CPF e senha.

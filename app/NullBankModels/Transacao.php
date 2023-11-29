@@ -139,7 +139,14 @@ class Transacao implements NullBankModel
         ";
 
         if ($search) {
-            $query = "SELECT * FROM transacoes WHERE id = $search";
+            $query = "
+                SELECT transacoes.*
+                FROM clientes
+                JOIN cliente_conta ON clientes.cpf = cliente_conta.cliente_cpf
+                JOIN contas ON cliente_conta.conta_id = contas.id AND cliente_conta.agencia_id = contas.agencia_id
+                JOIN transacoes ON contas.id = transacoes.conta_id
+                WHERE clientes.cpf = '$customerCpf' AND transacoes.id = $search;
+            ";
         }
 
         $transacoesData = DB::select($query);
