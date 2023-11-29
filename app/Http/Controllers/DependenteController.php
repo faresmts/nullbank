@@ -16,12 +16,18 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class DependenteController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $search = $request->has('search') ? $request->input('search') : null;
 
         $allDependants = Dependente::all($search);
@@ -48,14 +54,24 @@ class DependenteController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $dependantDto = DependenteDTO::fromRequest($request);
         Dependente::create($dependantDto->toArray());
 
         return redirect()->route('dependants.index');
     }
 
-    public function edit(string $id): View
+    public function edit(string $id): View|RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $employees = Funcionario::all();
         $dependant = Dependente::first($id);
 
@@ -66,6 +82,11 @@ class DependenteController extends Controller
 
     public function update(Request $request, int $id): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $dependant = Dependente::first($id);
         $dependantDto = DependenteDTO::fromRequest($request);
         $dependant->update($dependantDto->toArray());
@@ -75,6 +96,11 @@ class DependenteController extends Controller
 
     public function destroy(string $id): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $dependant = Dependente::first($id);
         $dependant->delete();
 

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class ContaController extends Controller
@@ -19,8 +20,13 @@ class ContaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $search = $request->has('search') ? $request->input('search') : null;
 
         $allAccounts = Conta::all($search);
@@ -56,6 +62,11 @@ class ContaController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         DB::beginTransaction();
             $accountDto = ContaDTO::fromRequest($request);
             $account = Conta::create($accountDto->toArray());
@@ -72,8 +83,13 @@ class ContaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id): View
+    public function edit(string $id): View|RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $account = Conta::first($id);
         $agencies = Agencia::all();
         $managers = Funcionario::allManagers();
@@ -91,6 +107,11 @@ class ContaController extends Controller
      */
     public function update(Request $request, string $id): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $account = Conta::first($id);
 
         DB::beginTransaction();
@@ -112,6 +133,11 @@ class ContaController extends Controller
      */
     public function destroy(string $id): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $account = Conta::first($id);
 
         DB::beginTransaction();

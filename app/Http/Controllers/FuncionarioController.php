@@ -15,12 +15,18 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class FuncionarioController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $search = $request->has('search') ? $request->input('search') : null;
 
         $allEmployees = Funcionario::all($search);
@@ -50,6 +56,11 @@ class FuncionarioController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         DB::beginTransaction();
             $addressDto = EnderecoDTO::fromRequest($request);
             $address = Endereco::create($addressDto->toArray());
@@ -66,8 +77,13 @@ class FuncionarioController extends Controller
         return redirect()->route('employees.index');
     }
 
-    public function edit(string $id): View
+    public function edit(string $id): View|RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $employee = Funcionario::first($id);
         $streetTypes = Endereco::getLogradourosTipos();
         $agencies = Agencia::all();
@@ -80,6 +96,11 @@ class FuncionarioController extends Controller
 
     public function update(Request $request, int $id): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $employee = Funcionario::first($id);
         $user = Usuario::first($employee->usuario_id);
         $address = Endereco::first($user->endereco_id);
@@ -102,6 +123,11 @@ class FuncionarioController extends Controller
 
     public function destroy(string $id): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $employee = Funcionario::first($id);
         $employee->delete();
 

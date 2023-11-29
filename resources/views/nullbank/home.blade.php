@@ -3,7 +3,26 @@
 
 @section('content')
 
-    <section class="dark:bg-gray-900 flex items-center justify-center min-h-screen">
+    <section class="dark:bg-gray-900 flex flex-col items-center justify-center min-h-screen">
+        @if(Session::has('error'))
+            <div id="error-popup" class="bg-red-300 rounded text-center text-gray-800 p-2">
+                {{ Session::get('error') }}
+            </div>
+
+            <script>
+                setTimeout(function() {
+                    var errorPopup = document.getElementById('error-popup');
+                    if (errorPopup) {
+                        errorPopup.style.transition = 'opacity 2s ease-in-out';
+                        errorPopup.style.opacity = '0';
+                        setTimeout(function() {
+                            errorPopup.style.display = 'none';
+                        }, 2000);
+                    }
+                }, 5000);
+            </script>
+        @endif
+
         <div class="">
             @if( $_SESSION['user_type'] == 'customer')
                 @php

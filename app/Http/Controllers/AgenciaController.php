@@ -11,12 +11,18 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class AgenciaController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $streetTypes = Endereco::getLogradourosTipos();
 
         $search = $request->has('search') ? $request->input('search') : null;
@@ -43,6 +49,11 @@ class AgenciaController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         DB::beginTransaction();
             $addressDto = EnderecoDTO::fromRequest($request);
             $address = Endereco::create($addressDto->toArray());
@@ -55,8 +66,13 @@ class AgenciaController extends Controller
         return redirect()->route('agencies.index');
     }
 
-    public function edit(string $id): View
+    public function edit(string $id): View|RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $agency = Agencia::first($id);
         $streetTypes = Endereco::getLogradourosTipos();
 
@@ -67,6 +83,11 @@ class AgenciaController extends Controller
 
     public function update(Request $request, int $id): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $agency = Agencia::first($id);
 
         DB::beginTransaction();
@@ -86,6 +107,11 @@ class AgenciaController extends Controller
 
     public function destroy(string $id): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $agency = Agencia::first($id);
         $agency->delete();
 

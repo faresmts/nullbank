@@ -26,8 +26,13 @@ class ClienteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $search = $request->has('search') ? $request->input('search') : null;
 
         $allCustomers = Cliente::all($search);
@@ -55,8 +60,13 @@ class ClienteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         DB::beginTransaction();
 
         $addressDto = EnderecoDTO::fromRequest($request);
@@ -77,8 +87,13 @@ class ClienteController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id): View
+    public function edit(string $id): View|RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $streetTypes = Endereco::getLogradourosTipos();
         $customer = Cliente::first($id);
 
@@ -92,6 +107,11 @@ class ClienteController extends Controller
      */
     public function update(Request $request, string $id): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $customer = Cliente::first($id);
         $user = Usuario::first($customer->usuario_id);
         $address = Endereco::first($user->endereco_id);
@@ -117,6 +137,11 @@ class ClienteController extends Controller
      */
     public function destroy(string $id): RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $customer = Cliente::first($id);
         $customer->delete();
 
