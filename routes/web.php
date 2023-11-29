@@ -4,6 +4,7 @@ use App\Http\Controllers\AgenciaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ContaController;
 use App\Http\Controllers\DependenteController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EnderecoController;
 use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\ManagerController;
@@ -51,12 +52,15 @@ Route::middleware([NullbankAuth::class])->group(function () {
     Route::group([
         'prefix' => 'managers',
     ], function ($route) {
-        Route::get('/{manager}/accounts', [ManagerController::class, 'accounts'])->name('managers.accounts.index');;
-        Route::post('/{manager}/accounts', [ManagerController::class, 'createAccount'])->name('managers.accounts.store');;
-        Route::get('/{manager}/accounts/{account}', [ManagerController::class, 'editAccount'])->name('managers.accounts.edit');;
-        Route::put('/{manager}/accounts/{account}', [ManagerController::class, 'updateAccount'])->name('managers.accounts.update');;
-        Route::delete('/{manager}/accounts/{account}', [ManagerController::class, 'deleteAccount'])->name('managers.accounts.destroy');;
+        Route::get('/{manager}/accounts', [ManagerController::class, 'accounts'])->name('managers.accounts.index');
+        Route::post('/{manager}/accounts', [ManagerController::class, 'createAccount'])->name('managers.accounts.store');
+        Route::get('/{manager}/accounts/{account}', [ManagerController::class, 'editAccount'])->name('managers.accounts.edit');
+        Route::put('/{manager}/accounts/{account}', [ManagerController::class, 'updateAccount'])->name('managers.accounts.update');
+        Route::delete('/{manager}/accounts/{account}', [ManagerController::class, 'deleteAccount'])->name('managers.accounts.destroy');
+
     });
+
+    Route::get('employees/{employee}/accounts', [EmployeeController::class, 'index'])->name('employees.accounts.index');
 
     Route::view('/home', 'nullbank.home')->name('home');
     Route::view('/new-account', 'nullbank.new-account')->name('new-account');

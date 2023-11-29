@@ -288,4 +288,38 @@ class Conta implements NullBankModel
 
         return $contasCollection;
     }
+
+    public static function allFromAgency(int $agencyId, string|null $search = ''): Collection
+    {
+        $query = "SELECT * FROM contas WHERE agencia_id = $agencyId";
+
+        if ($search) {
+            $query = "SELECT * FROM contas WHERE agencia_id = $agencyId AND id = $search";
+        }
+
+        $contasData = DB::select($query);
+
+        $contasCollection = new Collection();
+
+        foreach ($contasData as $data) {
+            $conta = new Conta(
+                $data->id,
+                $data->agencia_id,
+                $data->gerente_id,
+                $data->saldo,
+                $data->senha,
+                $data->tipo,
+                $data->juros,
+                $data->limite_credito,
+                $data->credito_usado,
+                $data->aniversario,
+                $data->created_at,
+                $data->updated_at,
+            );
+
+            $contasCollection->push($conta);
+        }
+
+        return $contasCollection;
+    }
 }

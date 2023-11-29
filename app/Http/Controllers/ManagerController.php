@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DTOs\ContaDTO;
+use App\Enums\EmployeeTypeEnum;
 use App\NullBankModels\Agencia;
 use App\NullBankModels\Cliente;
 use App\NullBankModels\Conta;
@@ -20,9 +21,14 @@ class ManagerController extends Controller
 
     public function accounts(Request $request): View|RedirectResponse
     {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $manager = Funcionario::first($_SESSION['user_id']);
 
-        if ($_SESSION['user_type'] == 'customer') {
+        if ($manager->cargo != EmployeeTypeEnum::GERENTE->value) {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
         }
@@ -63,6 +69,11 @@ class ManagerController extends Controller
 
         $manager = Funcionario::first($_SESSION['user_id']);
 
+        if ($manager->cargo != EmployeeTypeEnum::GERENTE->value) {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         DB::beginTransaction();
         $accountDto = ContaDTO::fromRequest($request);
         $account = Conta::create($accountDto->toArray());
@@ -83,9 +94,15 @@ class ManagerController extends Controller
             return redirect()->route('home');
         }
 
+        $manager = Funcionario::first($_SESSION['user_id']);
+
+        if ($manager->cargo != EmployeeTypeEnum::GERENTE->value) {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
         $account = Conta::first($id);
         $agencies = Agencia::all();
-        $manager = Funcionario::first($_SESSION['user_id']);
         $customers = Cliente::all();
 
         return view('nullbank.managers.accounts.edit')
@@ -106,6 +123,11 @@ class ManagerController extends Controller
         }
 
         $manager = Funcionario::first($_SESSION['user_id']);
+
+        if ($manager->cargo != EmployeeTypeEnum::GERENTE->value) {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
 
         $account = Conta::first($id);
 
@@ -135,6 +157,11 @@ class ManagerController extends Controller
         }
 
         $manager = Funcionario::first($_SESSION['user_id']);
+
+        if ($manager->cargo != EmployeeTypeEnum::GERENTE->value) {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
 
         $account = Conta::first($id);
 
