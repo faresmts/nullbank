@@ -27,7 +27,7 @@
                                   d="m1 9 4-4-4-4"/>
                         </svg>
                         <span
-                            class="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">Dependentes</span>
+                            class="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">Clientes</span>
                     </div>
                 </li>
             </ol>
@@ -50,7 +50,7 @@
                         <div
                             class="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
                             <div class="w-full md:w-1/2">
-                                <form action=" {{ route('dependants.index') }}" class="flex items-center">
+                                <form action=" {{ route('customers.index') }}" class="flex items-center">
                                     <label for="simple-search" class="sr-only">Search</label>
                                     <div class="relative w-full">
                                         <div
@@ -63,7 +63,7 @@
                                             </svg>
                                         </div>
                                         <input type="text" name="search" id="simple-search"
-                                               placeholder="Pesquise por dependentes" required=""
+                                               placeholder="Pesquise por clientes" required=""
                                                value="{{ request()->has('search') ? request()->input('search') : '' }}"
                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                                     </div>
@@ -82,7 +82,7 @@
 
                         <div class="ml-4">
                             @if(request()->has('search'))
-                                <a href=" {{ route('dependants.index')  }}"
+                                <a href=" {{ route('customers.index')  }}"
                                    class="font-medium text-blue-600 dark:text-blue-500 hover:underline flex items-center"><i
                                         class="mr-1 text-xs fa-solid fa-x"></i> <span>limpar pesquisa</span></a>
                             @endif
@@ -172,7 +172,7 @@
                                                             </svg>
                                                             <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
                                                                 Você tem certeza que quer
-                                                                excluir essa dependente?</h3>
+                                                                excluir esse cliente?</h3>
                                                             <div class="flex items-center gap-3 justify-center">
                                                                 <form method="POST"
                                                                       action="{{ route('customers.destroy', $customer->cpf) }}">

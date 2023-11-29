@@ -20,7 +20,7 @@ class NullbankAuth
         }
 
         if (!isset($_SESSION['user_id'])) {
-            return redirect()->route('login');
+            return redirect()->route('customer.login');
         }
 
         return $next($request);

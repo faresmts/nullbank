@@ -180,7 +180,7 @@
                                                             </svg>
                                                             <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
                                                                 Você tem certeza que quer
-                                                                excluir essa dependente?</h3>
+                                                                excluir esse dependente?</h3>
                                                             <div class="flex items-center gap-3 justify-center">
                                                                 <form method="POST"
                                                                       action="{{ route('dependants.destroy', $dependant->id) }}">
@@ -326,7 +326,6 @@
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('logradouro').value = data.logradouro;
-                        document.getElementById('numero').value = ''; // Preencha com o número se tiver essa informação disponível na resposta da API
                         document.getElementById('bairro').value = data.bairro;
                         document.getElementById('cidade').value = data.localidade;
                         document.getElementById('estado').value = data.uf;

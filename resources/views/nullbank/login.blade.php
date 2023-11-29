@@ -13,6 +13,24 @@
                     <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                         Entre na sua conta
                     </h1>
+                    @if(Session::has('error'))
+                        <div id="error-popup" class="bg-red-300 rounded text-center text-gray-800 py-2">
+                            {{ Session::get('error') }}
+                        </div>
+
+                        <script>
+                            setTimeout(function() {
+                                var errorPopup = document.getElementById('error-popup');
+                                if (errorPopup) {
+                                    errorPopup.style.transition = 'opacity 2s ease-in-out';
+                                    errorPopup.style.opacity = '0';
+                                    setTimeout(function() {
+                                        errorPopup.style.display = 'none';
+                                    }, 2000);
+                                }
+                            }, 5000);
+                        </script>
+                    @endif
                     <form class="space-y-4 md:space-y-6" method="POST" action="{{ route('customer.login') }}">
                         @csrf
                         <div>

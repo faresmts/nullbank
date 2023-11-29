@@ -31,13 +31,7 @@ Route::post('/employee/login', [ LoginController::class, 'employee' ])->name('em
 Route::view('/', 'nullbank.login')->name('customer');
 Route::post('/login', [LoginController::class, 'login'])->name('customer.login');
 
-Route::get('/logout', function (){
-    if (!isset($_SESSION)){
-        session_start();
-    }
-
-    session_destroy();
-});
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 //Route::resource('/users', UsuarioController::class)->names('users');
 //Route::post('/users/login', [ LoginController::class, 'login' ])->name('users.login');
@@ -53,6 +47,8 @@ Route::middleware([NullbankAuth::class])->group(function () {
     Route::resource('/addresses', EnderecosController::class)->names('addresses');
     Route::resource('/transactions', TransacoesController::class)->names('transactions');
     Route::view('/home', 'nullbank.home')->name('home');
+    Route::view('/new-account', 'nullbank.new-account')->name('new-account');
+    Route::get('/account-selected/{account}', [LoginController::class, 'accountSelected'])->name('customer.account-selected');
 });
 
 
