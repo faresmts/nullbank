@@ -9,7 +9,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\View\View;
 
-class EnderecosController extends Controller
+class EnderecoController extends Controller
 {
     /**
      * Display a listing of the resource.

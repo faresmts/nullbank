@@ -3,6 +3,7 @@
 namespace App\NullBankModels;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class Transacao implements NullBankModel
@@ -95,5 +96,34 @@ class Transacao implements NullBankModel
         ";
 
         return DB::delete($query);
+    }
+
+    public static function all(string|null $search = ''): Collection
+    {
+        $query = "SELECT * FROM transacoes";
+
+        if ($search) {
+            $query = "SELECT * FROM transacoes WHERE id = $search";
+        }
+
+        $transacoesData = DB::select($query);
+
+        $transacoesCollection = new Collection();
+
+        foreach ($transacoesData as $data) {
+            $transacao = new Transacao(
+                $data->id,
+                $data->conta_id,
+                $data->origem,
+                $data->tipo,
+                $data->valor,
+                $data->created_at,
+                $data->updated_at,
+            );
+
+            $transacoesCollection->push($transacao);
+        }
+
+        return $transacoesCollection;
     }
 }
