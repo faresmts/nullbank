@@ -7,7 +7,8 @@ use App\Http\Controllers\DependenteController;
 use App\Http\Controllers\EnderecosController;
 use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\TransacoesController;
-use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\LoginController;
+use App\Http\Middleware\NullbankAuth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,18 +22,37 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::view('/', 'nullbank.login')->name('home');
+Route::view('/admin', 'nullbank.admin')->name('admin');
+Route::post('/admin/login', [ LoginController::class, 'admin' ])->name('admin.login');
+
+Route::view('/employee', 'nullbank.employee')->name('employee');
+Route::post('/employee/login', [ LoginController::class, 'employee' ])->name('employee.login');
+
+Route::view('/', 'nullbank.login')->name('customer');
+Route::post('/login', [LoginController::class, 'login'])->name('customer.login');
+
+Route::get('/logout', function (){
+    if (!isset($_SESSION)){
+        session_start();
+    }
+
+    session_destroy();
+});
 
 //Route::resource('/users', UsuarioController::class)->names('users');
-Route::post('/users/login', [ UsuarioController::class, 'login' ])->name('users.login');
+//Route::post('/users/login', [ LoginController::class, 'login' ])->name('users.login');
 
 //Route::get('/register', [ UsuarioController::class, 'register' ])->name('customers.register');
 
-Route::resource('/agencies', AgenciaController::class)->names('agencies');
-Route::resource('/employees', FuncionarioController::class)->names('employees');
-Route::resource('/customers', ClienteController::class)->names('customers');
-Route::resource('/accounts', ContaController::class)->names('accounts');
-Route::resource('/dependants', DependenteController::class)->names('dependants');
-Route::resource('/addresses', EnderecosController::class)->names('addresses');
-Route::resource('/transactions', TransacoesController::class)->names('transactions');
+Route::middleware([NullbankAuth::class])->group(function () {
+    Route::resource('/agencies', AgenciaController::class)->names('agencies');
+    Route::resource('/employees', FuncionarioController::class)->names('employees');
+    Route::resource('/customers', ClienteController::class)->names('customers');
+    Route::resource('/accounts', ContaController::class)->names('accounts');
+    Route::resource('/dependants', DependenteController::class)->names('dependants');
+    Route::resource('/addresses', EnderecosController::class)->names('addresses');
+    Route::resource('/transactions', TransacoesController::class)->names('transactions');
+    Route::view('/home', 'nullbank.home')->name('home');
+});
+
 
