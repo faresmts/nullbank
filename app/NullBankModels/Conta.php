@@ -115,6 +115,21 @@ class Conta implements NullBankModel
             'aniversario' => $aniversario,
         ];
 
+        switch ($updateData['tipo']) {
+            case ('CC'):
+                $updateData['juros'] = 'NULL';
+                $updateData['limite_credito'] = 'NULL';
+                break;
+            case ('CP'):
+                $updateData['aniversario'] = 'NULL';
+                $updateData['limite_credito'] = 'NULL';
+                break;
+            case ('CE'):
+                $updateData['aniversario'] = 'NULL';
+                $updateData['juros'] = 'NULL';
+                break;
+        }
+
         $query = "
             UPDATE `nullbank`.`contas`
             SET
@@ -222,5 +237,12 @@ class Conta implements NullBankModel
         ";
 
         return DB::insert($query);
+    }
+
+    public function dettach(): int
+    {
+        $query = "DELETE FROM cliente_conta WHERE conta_id = $this->id";
+
+        return DB::delete($query);
     }
 }

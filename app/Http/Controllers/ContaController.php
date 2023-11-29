@@ -60,6 +60,10 @@ class ContaController extends Controller
             $accountDto = ContaDTO::fromRequest($request);
             $account = Conta::create($accountDto->toArray());
             $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf'));
+
+            if ($request->input('cpf-2')) {
+                $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf-2'));
+            }
         DB::commit();
 
         return redirect()->route('accounts.index');
@@ -68,24 +72,53 @@ class ContaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id): View
     {
-        //
+        $account = Conta::first($id);
+        $agencies = Agencia::all();
+        $managers = Funcionario::allManagers();
+        $customers = Cliente::all();
+
+        return view('nullbank.accounts.edit')
+            ->with('agencies', $agencies)
+            ->with('managers', $managers)
+            ->with('account', $account)
+            ->with('customers', $customers);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id): RedirectResponse
     {
-        //
+        $account = Conta::first($id);
+
+        DB::beginTransaction();
+            $accountDto = ContaDTO::fromRequest($request);
+            $account->update($accountDto->toArray());
+            $account->dettach();
+            $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf'));
+
+            if ($request->input('cpf-2')) {
+                $account->attach($account->id, $accountDto->agencia_id, $request->input('cpf-2'));
+            }
+        DB::commit();
+
+        return redirect()->route('accounts.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
-        //
+        $account = Conta::first($id);
+
+        DB::beginTransaction();
+            $account->dettach();
+            $account->delete();
+        DB::commit();
+
+        return redirect()->route('accounts.index');
     }
 }
