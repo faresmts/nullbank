@@ -32,14 +32,29 @@ Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware([NullbankAuth::class])->group(function () {
     Route::resource('/agencies', AgenciaController::class)->names('agencies');
+
     Route::resource('/employees', FuncionarioController::class)->names('employees');
+
     Route::resource('/customers', ClienteController::class)->names('customers');
+    Route::group([
+        'prefix' => 'customers',
+    ], function ($route) {
+        Route::get('/{customer}/transactions', [ClienteController::class, 'customerTransactions'])->name('customers.transactions.index');;
+        Route::post('/{customer}/transactions', [ClienteController::class, 'createCustomerTransaction'])->name('customers.transactions.store');;
+    });
+
     Route::resource('/accounts', ContaController::class)->names('accounts');
+
     Route::resource('/dependants', DependenteController::class)->names('dependants');
+
     Route::resource('/addresses', EnderecoController::class)->names('addresses');
+
     Route::resource('/transactions', TransacaoController::class)->names('transactions');
+
     Route::view('/home', 'nullbank.home')->name('home');
+
     Route::view('/new-account', 'nullbank.new-account')->name('new-account');
+
     Route::get('/account-selected/{account}', [LoginController::class, 'accountSelected'])->name('customer.account-selected');
 });
 

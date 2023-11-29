@@ -1,4 +1,13 @@
-@php use App\Enums\TransactionOriginEnum;use App\Enums\TransactionTypeEnum;use App\NullBankModels\Agencia;use App\NullBankModels\Conta;use App\NullBankModels\Endereco;use App\NullBankModels\Transacao;use Carbon\Carbon; @endphp
+@php
+    use App\Enums\TransactionOriginEnum;use App\Enums\TransactionTypeEnum;use App\NullBankModels\Agencia;use App\NullBankModels\Cliente;use App\NullBankModels\Conta;use App\NullBankModels\Endereco;use App\NullBankModels\Funcionario;use App\NullBankModels\Transacao;use Carbon\Carbon;
+       if ($_SESSION['user_type'] == 'employee') {
+           $employee = Funcionario::first($_SESSION['user_id']);
+       }
+
+       if ($_SESSION['user_type'] == 'customer') {
+           $customer = Cliente::first($_SESSION['user_id']);
+       }
+@endphp
 @extends('layouts.app')
 
 @section('content')
@@ -38,13 +47,18 @@
                         <div class="flex-1 flex items-center space-x-2">
                             <h5>
                                 <span class="text-gray-500">Total de Transações:</span>
-                                <span class="dark:text-white">{{ Transacao::all()->count() }}</span>
+                                <span class="dark:text-white">{{ request()->routeIs('customers.transactions.index') ? Transacao::allFromCustomer(customerCpf: $customer->cpf, search: '')->count() : Transacao::all()->count() }}</span>
                             </h5>
                         </div>
                     </div>
                     <div
                         class="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
                         <div class="w-full md:w-1/2">
+                            @if(request()->routeIs('customers.transactions.index'))
+                                <form action=" {{ route('customers.transactions.index', $customer->cpf) }}" class="flex items-center">
+                            @else
+                                <form action=" {{ route('transactions.index') }}" class="flex items-center">
+                            @endif
                             <form action=" {{ route('transactions.index') }}" class="flex items-center">
                                 <label for="simple-search" class="sr-only">Search</label>
                                 <div class="relative w-full">
@@ -62,9 +76,17 @@
                                 </div>
                             </form>
                             @if(request()->has('search'))
-                                <a href=" {{ route('transactions.index')  }}"
-                                   class="mt-2 font-medium text-blue-600 dark:text-blue-500 hover:underline flex items-center"><i
-                                        class="mr-1 text-xs fa-solid fa-x"></i> <span>limpar pesquisa</span></a>
+                                @if(request()->routeIs('customers.transactions.index'))
+                                    <a href=" {{ route('customers.transactions.index', $customer->cpf)  }}"
+                                       class="mt-2 font-medium text-blue-600 dark:text-blue-500 hover:underline flex items-center"><i
+                                            class="mr-1 text-xs fa-solid fa-x"></i> <span>limpar pesquisa</span>
+                                    </a>
+                                @else
+                                    <a href=" {{ route('transactions.index')  }}"
+                                       class="mt-2 font-medium text-blue-600 dark:text-blue-500 hover:underline flex items-center"><i
+                                            class="mr-1 text-xs fa-solid fa-x"></i> <span>limpar pesquisa</span>
+                                    </a>
+                                @endif
                             @endif
                         </div>
 
@@ -73,7 +95,7 @@
                             <button type="button" id="createButton" data-modal-target="createModal"
                                     data-modal-toggle="createModal"
                                     class="w-full px-2 py-2 md:w-auto flex items-center justify-center py-0 px-4 text-sm text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                                <i class="fa-solid fa-plus mr-2"></i> Criar Transferência
+                                <i class="fa-solid fa-plus mr-2"></i> Criar Transação
                             </button>
                         </div>
                     </div>
@@ -152,65 +174,85 @@
                         </button>
                     </div>
                     <!-- Modal body -->
-                    <form method="POST" action="{{ route('transactions.store') }}">
-                        @csrf
-                        <div class="grid grid-cols-2 gap-5 justify-center">
-                            <div class="mb-5">
-                                <label for="conta_id"
-                                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Conta</label>
-                                <select id="conta_id" name="conta_id"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        required>
-                                    <option value="" selected disabled>Selecione a conta</option>
-                                    @foreach($accounts as $account)
-                                        <option value="{{$account->id}}">{{str_pad($account->id, 5, '0', STR_PAD_LEFT)}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                    @if(request()->routeIs('customers.transactions.index'))
+                        <form method="POST" action="{{ route('customers.transactions.store', $customer->cpf) }}">
+                            @csrf
+                            <div class="grid grid-cols-2 gap-5 justify-center">
+                                <div class="mb-5">
+                                    <label for="conta_id"
+                                           class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Conta</label>
+                                    <input type="number" id="conta_id" name="conta_id"
+                                           value="{{str_pad($account->id, 5, '0', STR_PAD_LEFT)}}"
+                                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                           required readonly>
+                                </div>
+                                @else
+                                    <form method="POST" action="{{ route('transactions.store') }}">
+                                        @csrf
+                                        <div class="grid grid-cols-2 gap-5 justify-center">
+                                            <div class="mb-5">
+                                                <label for="conta_id"
+                                                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Conta</label>
+                                                <select id="conta_id" name="conta_id"
+                                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                        required>
+                                                    <option value="" selected disabled>Selecione a conta</option>
+                                                    @foreach($accounts as $account)
+                                                        <option
+                                                            value="{{$account->id}}">{{str_pad($account->id, 5, '0', STR_PAD_LEFT)}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            @endif
+                                            <div class="mb-5">
+                                                <label for="origem"
+                                                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Origem
+                                                    da Transferência</label>
+                                                <select id="origem" name="origem"
+                                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                        required>
+                                                    <option value="" selected disabled>Selecione a origem da transação
+                                                    </option>
+                                                    @foreach(TransactionOriginEnum::toArray() as $key => $origin)
+                                                        <option value="{{$key}}">{{$origin}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
 
-                            <div class="mb-5">
-                                <label for="origem"
-                                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo de Conta</label>
-                                <select id="origem" name="origem"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
-                                    <option value="" selected disabled>Selecione a origem transação</option>
-                                    @foreach(TransactionOriginEnum::toArray() as $key => $origin)
-                                        <option value="{{$key}}">{{$origin}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                            <div class="mb-5">
+                                                <label for="tipo"
+                                                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo
+                                                    de Transferência</label>
+                                                <select id="tipo" name="tipo"
+                                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                        required>
+                                                    <option value="" selected disabled>Selecione o tipo da transação
+                                                    </option>
+                                                    @foreach(TransactionTypeEnum::toArray() as $key => $type)
+                                                        <option value="{{$key}}">{{$type}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
 
-                            <div class="mb-5">
-                                <label for="tipo"
-                                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo de Conta</label>
-                                <select id="tipo" name="tipo"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
-                                    <option value="" selected disabled>Selecione o tipo de transação</option>
-                                    @foreach(TransactionTypeEnum::toArray() as $key => $type)
-                                        <option value="{{$key}}">{{$type}}</option>
-                                    @endforeach
-                                </select>
+                                            <div class="mb-5">
+                                                <label for="valor"
+                                                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Valor</label>
+                                                <input type="number" id="valor" name="valor"
+                                                       placeholder="R$"
+                                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                       required>
+                                            </div>
+                                        </div>
+                                        <div class="items-center space-y-4 sm:flex sm:space-y-0 sm:space-x-4">
+                                            <button type="submit"
+                                                    class="w-full px-2 py-2 md:w-auto flex items-center justify-center py-0 px-4 text-sm text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                                                Criar
+                                            </button>
+                                        </div>
+                                    </form>
                             </div>
-
-                            <div class="mb-5">
-                                <label for="valor"
-                                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Valor</label>
-                                <input type="number" id="valor" name="valor"
-                                       placeholder="R$"
-                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                       required>
-                            </div>
-                        </div>
-                        <div class="items-center space-y-4 sm:flex sm:space-y-0 sm:space-x-4">
-                            <button type="submit"
-                                    class="w-full px-2 py-2 md:w-auto flex items-center justify-center py-0 px-4 text-sm text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                                Criar
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>
-    </div>
 
 @endsection

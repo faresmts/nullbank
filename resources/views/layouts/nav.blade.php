@@ -1,7 +1,11 @@
 @php
-    use App\NullBankModels\Funcionario;
+    use App\NullBankModels\Cliente;use App\NullBankModels\Funcionario;
     if ($_SESSION['user_type'] == 'employee') {
         $employee = Funcionario::first($_SESSION['user_id']);
+    }
+
+    if ($_SESSION['user_type'] == 'customer') {
+        $customer = Cliente::first($_SESSION['user_id']);
     }
 @endphp
 

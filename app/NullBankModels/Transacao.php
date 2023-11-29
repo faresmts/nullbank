@@ -126,4 +126,40 @@ class Transacao implements NullBankModel
 
         return $transacoesCollection;
     }
+
+    public static function allFromCustomer(string|null $search = '', string $customerCpf): Collection
+    {
+        $query = "
+            SELECT transacoes.*
+                FROM clientes
+                JOIN cliente_conta ON clientes.cpf = cliente_conta.cliente_cpf
+                JOIN contas ON cliente_conta.conta_id = contas.id AND cliente_conta.agencia_id = contas.agencia_id
+                JOIN transacoes ON contas.id = transacoes.conta_id
+                WHERE clientes.cpf = '$customerCpf';
+        ";
+
+        if ($search) {
+            $query = "SELECT * FROM transacoes WHERE id = $search";
+        }
+
+        $transacoesData = DB::select($query);
+
+        $transacoesCollection = new Collection();
+
+        foreach ($transacoesData as $data) {
+            $transacao = new Transacao(
+                $data->id,
+                $data->conta_id,
+                $data->origem,
+                $data->tipo,
+                $data->valor,
+                $data->created_at,
+                $data->updated_at,
+            );
+
+            $transacoesCollection->push($transacao);
+        }
+
+        return $transacoesCollection;
+    }
 }

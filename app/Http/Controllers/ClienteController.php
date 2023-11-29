@@ -4,17 +4,21 @@ namespace App\Http\Controllers;
 
 use App\DTOs\ClienteDTO;
 use App\DTOs\EnderecoDTO;
+use App\DTOs\TransacaoDTO;
 use App\DTOs\UsuarioDTO;
 use App\NullBankModels\Agencia;
 use App\NullBankModels\Cliente;
+use App\NullBankModels\Conta;
 use App\NullBankModels\Endereco;
 use App\NullBankModels\Funcionario;
+use App\NullBankModels\Transacao;
 use App\NullBankModels\Usuario;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class ClienteController extends Controller
@@ -118,4 +122,41 @@ class ClienteController extends Controller
 
         return redirect()->route('customers.index');
     }
+
+    public function customerTransactions(Request $request): View|RedirectResponse
+    {
+        $search = $request->has('search') ? $request->input('search') : null;
+
+        $allTransactions = Transacao::allFromCustomer($search, $_SESSION['user_id']);
+
+        $accounts = Conta::all();
+
+        $perPage = $request->input('perPage', 20);
+
+        $currentPage = Paginator::resolveCurrentPage();
+        $currentPageItems = $allTransactions->slice(($currentPage - 1) * $perPage, $perPage)->values();
+
+        $transactions = new LengthAwarePaginator(
+            $currentPageItems,
+            $allTransactions->count(),
+            $perPage,
+            $currentPage,
+            ['path' => Paginator::resolveCurrentPath()]
+        );
+
+        return view('nullbank.transactions.index')
+            ->with('transactions', $transactions)
+            ->with('accounts', $accounts);
+    }
+
+    public function createCustomerTransaction(Request $request): RedirectResponse
+    {
+        $transactionDto = TransacaoDTO::fromRequest($request);
+        Transacao::create($transactionDto->toArray());
+
+        $customer = Cliente::first($_SESSION['user_id']);
+
+        return redirect()->route('customers.transactions.index', $customer->cpf);
+    }
+
 }
