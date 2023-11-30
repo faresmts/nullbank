@@ -1,6 +1,6 @@
 # Descrição – Modelo de negócios:
 
-- Agências
+- Agências OK
   - número (id), 
   - nome, 
   - salário_montante_total
@@ -9,7 +9,7 @@
   - cidade 
 
 
-- Funcionários
+- Funcionários 
   - agência_id (chave externa 1:n) 
   - matrícula (usada também para login), 
   - senha (criptografada), 

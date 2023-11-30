@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use function Laravel\Prompts\select;
 
 class Funcionario implements NullBankModel
 {
@@ -159,6 +160,20 @@ class Funcionario implements NullBankModel
             WHERE `id` = $this->id;
         ";
 
+        $dependentesQuery = "
+            SELECT dependentes.id
+            FROM funcionarios
+            JOIN dependentes ON funcionarios.id = dependentes.funcionario_id
+            WHERE funcionarios.id = $this->id;
+        ";
+
+        $dependentesIds = DB::select($dependentesQuery);
+
+        foreach ($dependentesIds as $dependenteId) {
+            $dependente = Dependente::first($dependenteId->id);
+            $dependente->delete();
+        }
+
         DB::beginTransaction();
         $return = DB::delete($query);
         $user->delete();
@@ -295,4 +310,9 @@ class Funcionario implements NullBankModel
 
         return $funcionariosCollection;
     }
+
+//    public function getCountContas(): int
+//    {
+//        $query =
+//    }
 }

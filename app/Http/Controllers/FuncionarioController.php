@@ -128,7 +128,9 @@ class FuncionarioController extends Controller
             return redirect()->route('home');
         }
 
+
         $employee = Funcionario::first($id);
+        if ($employee->)
         $employee->delete();
 
         return redirect()->route('employees.index');
