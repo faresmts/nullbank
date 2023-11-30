@@ -128,9 +128,13 @@ class FuncionarioController extends Controller
             return redirect()->route('home');
         }
 
-
         $employee = Funcionario::first($id);
-        if ($employee->)
+
+        if ($employee->getCountContas() > 0) {
+            Session::flash('error', 'Funcionário com contas gerenciadas, deleção não permitida!');
+            return redirect()->route('employees.index');
+        }
+
         $employee->delete();
 
         return redirect()->route('employees.index');

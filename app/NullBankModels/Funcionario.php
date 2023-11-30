@@ -311,8 +311,16 @@ class Funcionario implements NullBankModel
         return $funcionariosCollection;
     }
 
-//    public function getCountContas(): int
-//    {
-//        $query =
-//    }
+    public function getCountContas(): int
+    {
+        $query = "
+          SELECT COUNT(*) AS quantidade_contas
+            FROM contas
+            WHERE gerente_id = $this->id
+        ";
+
+        $count = DB::select($query);
+
+        return $count[0]->quantidade_contas;
+    }
 }

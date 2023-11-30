@@ -33,6 +33,25 @@
             </ol>
         </nav>
 
+        @if(Session::has('error'))
+            <div id="error-popup" class="bg-red-300 rounded text-center text-gray-800 py-2">
+                {{ Session::get('error') }}
+            </div>
+
+            <script>
+                setTimeout(function() {
+                    var errorPopup = document.getElementById('error-popup');
+                    if (errorPopup) {
+                        errorPopup.style.transition = 'opacity 2s ease-in-out';
+                        errorPopup.style.opacity = '0';
+                        setTimeout(function() {
+                            errorPopup.style.display = 'none';
+                        }, 2000);
+                    }
+                }, 5000);
+            </script>
+        @endif
+
         <section class="mt-5 dark:bg-gray-900 p-3 sm:p-5 antialiased">
             <div class="mx-auto max-w-screen-2xl px-4 lg:px-12">
                 <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
