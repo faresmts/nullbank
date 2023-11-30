@@ -31,8 +31,8 @@
     @case(EmployeeTypeEnum::CAIXA->value)
         <ul class="space-y-2 font-medium">
             <li>
-                <a href=" {{ route('banktellers.transactions.index', $employee->id) }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 {{ request()->routeIs('transactions.*') ? 'bg-gray-100' : '' }} dark:hover:bg-gray-700 group hover:scale-105 transition-transform duration-300" wire:navigate>
-                    <i class="fa-solid fa-money-bill-transfer w-5 h-5 ml-0.5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 {{ request()->routeIs('transactions.*') ? 'text-gray-900' : '' }} dark:group-hover:text-white"></i>
+                <a href=" {{ route('banktellers.transactions.index', $employee->id) }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 {{ request()->routeIs('banktellers.transactions.*') ? 'bg-gray-100' : '' }} dark:hover:bg-gray-700 group hover:scale-105 transition-transform duration-300" wire:navigate>
+                    <i class="fa-solid fa-money-bill-transfer w-5 h-5 ml-0.5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 {{ request()->routeIs('banktellers.transactions.*') ? 'text-gray-900' : '' }} dark:group-hover:text-white"></i>
                     <span class="ms-3">Portal de Transações</span>
                 </a>
             </li>
@@ -43,8 +43,8 @@
 
 <ul class="space-y-2 font-medium">
     <li>
-        <a href=" {{ route('employees.accounts.index', $employee->id) }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 {{ request()->routeIs('managers.accounts.*') ? 'bg-gray-100' : '' }} dark:hover:bg-gray-700 group hover:scale-105 transition-transform duration-300" wire:navigate>
-            <i class="fa-solid fa-landmark w-5 h-5 ml-0.5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 {{ request()->routeIs('managers.accounts.*') ? 'text-gray-900' : '' }} dark:group-hover:text-white"></i>
+        <a href=" {{ route('employees.accounts.index', $employee->id) }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 {{ request()->routeIs('employees.accounts.*') ? 'bg-gray-100' : '' }} dark:hover:bg-gray-700 group hover:scale-105 transition-transform duration-300" wire:navigate>
+            <i class="fa-solid fa-landmark w-5 h-5 ml-0.5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 {{ request()->routeIs('employees.accounts.*') ? 'text-gray-900' : '' }} dark:group-hover:text-white"></i>
             <span class="ms-3">Contas da Agência</span>
         </a>
     </li>

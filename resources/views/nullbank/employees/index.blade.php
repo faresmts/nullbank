@@ -164,8 +164,7 @@
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                                       d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                             </svg>
-                                                            <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Você tem certeza que quer
-                                                                excluir essa funcionário?</h3>
+                                                            <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Você tem certeza que quer excluir esse funcionário?</h3>
                                                             <div class="flex items-center gap-3 justify-center">
                                                                 <form method="POST" action="{{ route('employees.destroy', $employee->id) }}">
                                                                     @csrf
