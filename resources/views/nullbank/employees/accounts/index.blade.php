@@ -96,9 +96,6 @@
                                         <p>{{ str_pad($account->id, 5, '0', STR_PAD_LEFT) }}</p>
                                     </td>
                                     <td class="p-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        <p>{{ str_pad($account->agencia_id, 5, '0', STR_PAD_LEFT) }}</p>
-                                    </td>
-                                    <td class="p-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                         <p> {{ $clientes->count() > 0 ? $clientes->first()->nome . ' ' . $clientes->first()->sobrenome : '----' }}</p>
                                     </td>
                                     <td class="p-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">

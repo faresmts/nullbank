@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgenciaController;
+use App\Http\Controllers\BankTellerController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ContaController;
 use App\Http\Controllers\DependenteController;
@@ -39,7 +40,7 @@ Route::middleware([NullbankAuth::class])->group(function () {
     Route::resource('/customers', ClienteController::class)->names('customers');
     Route::group([
         'prefix' => 'customers',
-    ], function ($route) {
+    ], function () {
         Route::get('/{customer}/transactions', [ClienteController::class, 'customerTransactions'])->name('customers.transactions.index');;
         Route::post('/{customer}/transactions', [ClienteController::class, 'createCustomerTransaction'])->name('customers.transactions.store');;
     });
@@ -51,13 +52,21 @@ Route::middleware([NullbankAuth::class])->group(function () {
 
     Route::group([
         'prefix' => 'managers',
-    ], function ($route) {
+    ], function () {
         Route::get('/{manager}/accounts', [ManagerController::class, 'accounts'])->name('managers.accounts.index');
         Route::post('/{manager}/accounts', [ManagerController::class, 'createAccount'])->name('managers.accounts.store');
+
         Route::get('/{manager}/accounts/{account}', [ManagerController::class, 'editAccount'])->name('managers.accounts.edit');
         Route::put('/{manager}/accounts/{account}', [ManagerController::class, 'updateAccount'])->name('managers.accounts.update');
-        Route::delete('/{manager}/accounts/{account}', [ManagerController::class, 'deleteAccount'])->name('managers.accounts.destroy');
 
+        Route::delete('/{manager}/accounts/{account}', [ManagerController::class, 'deleteAccount'])->name('managers.accounts.destroy');
+    });
+
+    Route::group([
+        'prefix' => 'banktellers',
+    ], function () {
+        Route::get('/{bankteller}/transactions', [BankTellerController::class, 'index'])->name('banktellers.transactions.index');
+        Route::post('/{bankteller}/transactions', [BankTellerController::class, 'store'])->name('banktellers.transactions.store');
     });
 
     Route::get('employees/{employee}/accounts', [EmployeeController::class, 'index'])->name('employees.accounts.index');

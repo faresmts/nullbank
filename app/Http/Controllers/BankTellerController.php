@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\DTOs\TransacaoDTO;
+use App\Enums\EmployeeTypeEnum;
+use App\NullBankModels\Agencia;
 use App\NullBankModels\Conta;
+use App\NullBankModels\Funcionario;
 use App\NullBankModels\Transacao;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -12,20 +15,29 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class TransacaoController extends Controller
+class BankTellerController extends Controller
 {
     public function index(Request $request): View|RedirectResponse
     {
-        if ($_SESSION['user_type'] != 'admin') {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
+        $bankteller = Funcionario::first($_SESSION['user_id']);
+
+        if ($bankteller->cargo != EmployeeTypeEnum::CAIXA->value) {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
         }
 
         $search = $request->has('search') ? $request->input('search') : null;
 
-        $allTransactions = Transacao::all($search);
+        $allTransactions = Transacao::allFromAgency($bankteller->agencia_id, $search);
 
-        $accounts = Conta::all();
+        $agency = Agencia::first($bankteller->agencia_id);
+
+        $accounts = Conta::allFromAgency($bankteller->agencia_id);
 
         $perPage = $request->input('perPage', 20);
 
@@ -40,8 +52,10 @@ class TransacaoController extends Controller
             ['path' => Paginator::resolveCurrentPath()]
         );
 
-        return view('nullbank.transactions.index')
+        return view('nullbank.banktellers.transactions.index')
+            ->with('bankteller', $bankteller)
             ->with('transactions', $transactions)
+            ->with('agency', $agency)
             ->with('accounts', $accounts);
     }
 
@@ -50,7 +64,14 @@ class TransacaoController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        if ($_SESSION['user_type'] != 'admin') {
+        if ($_SESSION['user_type'] == 'customer') {
+            Session::flash('error', 'Acesso não permitido!');
+            return redirect()->route('home');
+        }
+
+        $bankteller = Funcionario::first($_SESSION['user_id']);
+
+        if ($bankteller->cargo != EmployeeTypeEnum::CAIXA->value) {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
         }
@@ -58,6 +79,6 @@ class TransacaoController extends Controller
         $transactionDto = TransacaoDTO::fromRequest($request);
         Transacao::create($transactionDto->toArray());
 
-        return redirect()->route('transactions.index');
+        return redirect()->route('banktellers.transactions.index', $bankteller->id);
     }
 }

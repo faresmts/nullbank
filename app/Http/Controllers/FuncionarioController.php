@@ -22,7 +22,7 @@ class FuncionarioController extends Controller
 {
     public function index(Request $request): View|RedirectResponse
     {
-        if ($_SESSION['user_type'] == 'customer') {
+        if ($_SESSION['user_type'] != 'admin') {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
         }
@@ -56,7 +56,7 @@ class FuncionarioController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        if ($_SESSION['user_type'] == 'customer') {
+        if ($_SESSION['user_type'] != 'admin') {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
         }
@@ -79,7 +79,7 @@ class FuncionarioController extends Controller
 
     public function edit(string $id): View|RedirectResponse
     {
-        if ($_SESSION['user_type'] == 'customer') {
+        if ($_SESSION['user_type'] != 'admin') {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
         }
@@ -96,7 +96,7 @@ class FuncionarioController extends Controller
 
     public function update(Request $request, int $id): RedirectResponse
     {
-        if ($_SESSION['user_type'] == 'customer') {
+        if ($_SESSION['user_type'] != 'admin') {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
         }
@@ -123,7 +123,7 @@ class FuncionarioController extends Controller
 
     public function destroy(string $id): RedirectResponse
     {
-        if ($_SESSION['user_type'] == 'customer') {
+        if ($_SESSION['user_type'] != 'admin') {
             Session::flash('error', 'Acesso não permitido!');
             return redirect()->route('home');
         }
