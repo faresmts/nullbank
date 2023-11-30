@@ -25,12 +25,12 @@ class BeforeInsertTransacaoTriggerSaldoECreditoNaoPodemFicarNegativados implemen
                 FROM contas
                 WHERE contas.id = NEW.conta_id;
 
-                IF NEW.valor > saldo_conta AND NEW.origem = 'Saldo' THEN
+                IF saldo_conta + NEW.valor < 0 AND NEW.origem = 'Saldo' THEN
                     SIGNAL SQLSTATE '45000'
                         SET MESSAGE_TEXT = 'O valor não pode ser maior do que o saldo disponível';
                 END IF;
 
-                IF NEW.valor > limite_credito_conta AND NEW.origem = 'Credito' THEN
+                IF limite_credito_conta + NEW.valor < 0 AND NEW.origem = 'Credito' THEN
                     SIGNAL SQLSTATE '45000'
                         SET MESSAGE_TEXT = 'O valor não pode ser maior do que o limite de crédito disponível';
                 END IF;

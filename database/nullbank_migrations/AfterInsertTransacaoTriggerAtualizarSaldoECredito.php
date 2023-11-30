@@ -14,7 +14,7 @@ class AfterInsertTransacaoTriggerAtualizarSaldoECredito implements NullBankMigra
             BEGIN
                 IF NEW.origem = 'Saldo' THEN
                     UPDATE contas
-                    SET contas.saldo = contas.saldo - NEW.valor
+                    SET contas.saldo = contas.saldo + NEW.valor
                     WHERE id = NEW.conta_id;
                 END IF;
 
